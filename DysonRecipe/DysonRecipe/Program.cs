@@ -125,14 +125,11 @@ namespace DysonRecipe
         }
     }
 
-
-
-
-
     class Program
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("注意：氢和原油的生产较为复杂暂时忽略");
             Console.WriteLine();
 
             Data.Load();
@@ -150,12 +147,14 @@ namespace DysonRecipe
 
         static void Calc()
         {
-            ItemPack target = new ItemPack("磁线圈", 2);
+            ItemPack target = new ItemPack("石墨烯", new Number(2, 3));
 
             var buildingEffective = new Dictionary<string, Number>()
             {
                 { "电弧熔炉", 1 },
                 { "制造台", new Number(1, 1)},
+                { "化工厂", 1 },
+                { "微型粒子对撞器", 1 },
 			};
 
             Dictionary<string, Dictionary<string, Number>> buildingNeed = new Dictionary<string, Dictionary<string, Number>>();

@@ -20,39 +20,49 @@ namespace DysonRecipe
                 int nullValueCount = 0;
                 for (int i = 2; i < sheet.Cells.Rows; i++)
                 {
-                    var value = sheet.Cells[i, 1].Value;
-                    if (value == null || string.IsNullOrEmpty(value.ToString()))
-                    {
-                        nullValueCount++;
-                        if (nullValueCount >= 10)
-                        {
-                            break;
-                        }
-                        continue;
-                    }
-                    nullValueCount = 0;
-                    string name = sheet.Cells[i, 1].Value.ToString();
-                    string count = sheet.Cells[i, 2].Value.ToString();
-                    List<string[]> needs= new List<string[]>();
-                    var needsRow = sheet.Cells[i, 3].Value.ToString().Split('|');
-                    foreach (var row in needsRow)
-                    {
-                        needs.Add(row.Split(':'));
-                    }
-                    string building = sheet.Cells[i, 4].Value.ToString();
-                    string time = sheet.Cells[i, 5].Value.ToString();
-                    string level = sheet.Cells[i, 6].Value.ToString();
+                    int j = 1;
 
-                    Recipe recipe = new Recipe();
-                    recipe.target = new ItemPack(name, new Number(count));
-                    foreach (var need in needs)
+                    try
                     {
-                        recipe.needs.Add(new ItemPack(need[0], new Number(need[1])));
+                        var value = sheet.Cells[i, 1].Value;
+                        if (value == null || string.IsNullOrEmpty(value.ToString()))
+                        {
+                            nullValueCount++;
+                            if (nullValueCount >= 10)
+                            {
+                                break;
+                            }
+                            continue;
+                        }
+                        nullValueCount = 0;
+                        string name = sheet.Cells[i, j++].Value.ToString();
+                        string count = sheet.Cells[i, j++].Value.ToString();
+                        List<string[]> needs= new List<string[]>();
+                        var needsRow = sheet.Cells[i, j++].Value.ToString().Split('|');
+                        foreach (var row in needsRow)
+                        {
+                            needs.Add(row.Split(':'));
+                        }
+                        Recipe recipe = new Recipe();
+                        recipe.target = new ItemPack(name, new Number(count));
+                        foreach (var need in needs)
+                        {
+                            recipe.needs.Add(new ItemPack(need[0], new Number(need[1])));
+                        }
+                        string building = sheet.Cells[i, j++].Value.ToString();
+                        recipe.building = building;
+                        string time = sheet.Cells[i, j++].Value.ToString();
+                        recipe.time = new Number(time);
+                        string level = sheet.Cells[i, j++].Value.ToString();
+                        recipe.level = int.Parse(level);
+                        recipes.Add(recipe);
                     }
-                    recipe.building = building;
-                    recipe.time = new Number(time);
-                    recipe.level = int.Parse(level);
-                    recipes.Add(recipe);
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(string.Format("Excel格式错误 {0}行 {1}列 路径：" + RECIPES_FILE_PATH, i, j-1));
+                        Console.WriteLine(e);
+                        throw;
+                    }
                 }
             }
         }
