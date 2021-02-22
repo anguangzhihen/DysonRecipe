@@ -79,9 +79,9 @@ namespace DysonRecipe
         {
             var newTime = time / effective;
             StringBuilder sb = new StringBuilder();
-            sb.Append("[ 输出：");
+            sb.Append("[ ");
             sb.Append(target.ToSpeedString(newTime));
-            sb.Append(" 输入：");
+            sb.Append(" ← ");
             bool first = true;
             foreach (var need in needs)
             {
