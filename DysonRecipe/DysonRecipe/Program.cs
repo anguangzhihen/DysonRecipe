@@ -44,31 +44,6 @@ namespace DysonRecipe
 			ProcessResult();
 		}
 
-		public Number Plus(Number other)
-		{
-			var divNum = GetLeastCommonMutiple(dividedNum, other.dividedNum);
-			num = num * divNum / dividedNum + other.num * divNum / other.dividedNum;
-			dividedNum = divNum;
-			ProcessResult();
-			return this;
-		}
-
-		public Number Mul(Number other)
-		{
-			num *= other.num;
-			dividedNum *= other.dividedNum;
-			ProcessResult();
-			return this;
-		}
-
-		public Number Div(Number other)
-		{
-			num *= other.dividedNum;
-			dividedNum *= other.num;
-			ProcessResult();
-			return this;
-		}
-
 		void ProcessResult()
 		{
 			var tmp = GetLargestCommonDivisor(num, dividedNum);
@@ -93,6 +68,29 @@ namespace DysonRecipe
 		static int GetLeastCommonMutiple(int n1, int n2)
 		{
 			return n1 * n2 / GetLargestCommonDivisor(n1, n2);
+		}
+
+		public static Number operator +(Number n1, Number n2)
+		{
+			var divNum = GetLeastCommonMutiple(n1.dividedNum, n2.dividedNum);
+			var num = n1.num * divNum / n1.dividedNum + n2.num * divNum / n2.dividedNum;
+			var number = new Number(num, divNum);
+			number.ProcessResult();
+			return number;
+		}
+
+		public static Number operator *(Number n1, Number n2)
+		{
+			var number = new Number(n1.num * n2.num, n1.dividedNum * n2.dividedNum);
+			number.ProcessResult();
+			return number;
+		}
+
+		public static Number operator /(Number n1, Number n2)
+		{
+			var number = new Number(n1.num * n2.dividedNum, n1.dividedNum * n2.num);
+			number.ProcessResult();
+			return number;
 		}
 
 		public static implicit operator Number(int num)
@@ -123,9 +121,7 @@ namespace DysonRecipe
 
 		public float CalcSpeed(Number time)
 		{
-			var tmp = count;
-			tmp.Div(time);
-			return tmp.ToFloat();
+			return (count / time).ToFloat();
 		}
 
 		public override string ToString()
@@ -151,11 +147,10 @@ namespace DysonRecipe
 
 		public string ToSpeedString(Number effective)
 		{
-			var tmp = time;
-			tmp.Mul(effective);
+			var newTime = time / effective;
 			StringBuilder sb = new StringBuilder();
 			sb.Append("[ 输出：");
-			sb.Append(target.ToSpeedString(tmp));
+			sb.Append(target.ToSpeedString(newTime));
 			sb.Append(" 输入：");
 			bool first = true;
 			foreach (var need in needs)
@@ -169,7 +164,7 @@ namespace DysonRecipe
 					sb.Append(" | ");
 				}
 
-				sb.Append(need.ToSpeedString(tmp));
+				sb.Append(need.ToSpeedString(newTime));
 			}
 			sb.Append("]");
 			return sb.ToString();
@@ -179,6 +174,20 @@ namespace DysonRecipe
 	class Program
 	{
 		static void Main(string[] args)
+		{
+			try
+			{
+				Calc();
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+				Console.WriteLine("失败，计算出错");
+				Console.ReadLine();
+			}
+		}
+
+		static void Calc()
 		{
 			ItemPack target = new ItemPack(ItemType.MagnetCoil, 2);
 
@@ -195,7 +204,7 @@ namespace DysonRecipe
 			var buildingEffective = new Dictionary<ItemType, Number>()
 			{
 				{ ItemType.Furnace, 1 },
-				{ ItemType.Manufacture, 1},	//new Number(3, 4)
+				{ ItemType.Manufacture, new Number(0, 1)},	//
 			};
 
 			Dictionary<ItemType, Dictionary<ItemType, Number>> buildingNeed = new Dictionary<ItemType, Dictionary<ItemType, Number>>();
@@ -263,41 +272,30 @@ namespace DysonRecipe
 				}
 				else
 				{
-					try
+					var recipe = itemTypeToRecipes[itemPack.itemType];
+					foreach (var need in recipe.needs)
 					{
-						var recipe = itemTypeToRecipes[itemPack.itemType];
-						foreach (var need in recipe.needs)
-						{
-							var tmpNeed = need;;
-							tmpNeed.count.Mul(itemPack.count);
-							//tmpNeed.count.Mul(recipe.time);
-							tmpNeed.count.Div(recipe.target.count);
-							tmp.Add(tmpNeed);
-						}
-						Number buildingCount;
-						Dictionary<ItemType, Number> dict;
-						if (!buildingNeed.TryGetValue(recipe.building, out dict))
-						{
-							buildingNeed[recipe.building] = new Dictionary<ItemType, Number>();
-							dict = buildingNeed[recipe.building];
-						}
-						if (!dict.TryGetValue(recipe.target.itemType, out buildingCount))
-						{
-							buildingCount = new Number(0, 1);
-						}
-						var tmpTime = recipe.time;
-						var plusCount = tmpTime.Mul(buildingEffective[recipe.building]);
-						plusCount.Mul(itemPack.count);
-						plusCount.Div(recipe.target.count);
-						dict[recipe.target.itemType] = buildingCount.Plus(plusCount);
+						var tmpNeed = need;;
+						tmpNeed.count = tmpNeed.count * itemPack.count;
+						tmpNeed.count /= recipe.target.count;
+						tmp.Add(tmpNeed);
+					}
+					Number buildingCount;
+					Dictionary<ItemType, Number> dict;
+					if (!buildingNeed.TryGetValue(recipe.building, out dict))
+					{
+						buildingNeed[recipe.building] = new Dictionary<ItemType, Number>();
+						dict = buildingNeed[recipe.building];
+					}
+					if (!dict.TryGetValue(recipe.target.itemType, out buildingCount))
+					{
+						buildingCount = new Number(0, 1);
+					}
+					var plusCount = recipe.time / buildingEffective[recipe.building];
+					plusCount = plusCount * itemPack.count / recipe.target.count;
+					dict[recipe.target.itemType] = buildingCount + plusCount;
 
-						tmp.RemoveAt(0);
-					}
-					catch (Exception e)
-					{
-						Console.WriteLine(e);
-						Console.WriteLine("失败，计算出错");
-					}
+					tmp.RemoveAt(0);
 				}
 			}
 
@@ -313,7 +311,7 @@ namespace DysonRecipe
 			foreach (var itemPack in result)
 			{
 				var tmpItemPack = itemPack;
-				tmpItemPack.count.Mul(60);
+				tmpItemPack.count *= 60;
 				Console.WriteLine("\t" + tmpItemPack + "个每分");
 			}
 			Console.WriteLine();
