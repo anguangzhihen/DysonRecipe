@@ -106,6 +106,11 @@ namespace DysonRecipe
 				return num.ToString();
 			return num + "/" + dividedNum;
 		}
+
+		public float ToFloat()
+		{
+			return (float)num / dividedNum;
+		}
 	}
 
 	public struct ItemPack
@@ -116,9 +121,21 @@ namespace DysonRecipe
 			this.count = count;
 		}
 
+		public float CalcSpeed(Number time)
+		{
+			var tmp = count;
+			tmp.Div(time);
+			return tmp.ToFloat();
+		}
+
 		public override string ToString()
 		{
 			return Program.GetItemName(itemType) + " " + count;
+		}
+
+		public string ToSpeedString(Number time)
+		{
+			return string.Format("{0} {1:0.00}个每秒", Program.GetItemName(itemType), CalcSpeed(time));
 		}
 
 		public ItemType itemType;
@@ -131,6 +148,32 @@ namespace DysonRecipe
 		public List<ItemPack> needs;
 		public Number time;
 		public ItemType building;
+
+		public string ToSpeedString(Number effective)
+		{
+			var tmp = time;
+			tmp.Mul(effective);
+			StringBuilder sb = new StringBuilder();
+			sb.Append("[ 输出：");
+			sb.Append(target.ToSpeedString(tmp));
+			sb.Append(" 输入：");
+			bool first = true;
+			foreach (var need in needs)
+			{
+				if (first)
+				{
+					first = false;
+				}
+				else
+				{
+					sb.Append(" | ");
+				}
+
+				sb.Append(need.ToSpeedString(tmp));
+			}
+			sb.Append("]");
+			return sb.ToString();
+		}
 	}
 
 	class Program
@@ -149,10 +192,10 @@ namespace DysonRecipe
 			items.Add(ItemType.Furnace, new Item("熔炉", ItemType.Furnace));
 			items.Add(ItemType.Manufacture, new Item("制作台", ItemType.Manufacture));
 
-			var buildingEffective = new Dictionary<ItemType, float>()
+			var buildingEffective = new Dictionary<ItemType, Number>()
 			{
-				{ ItemType.Furnace, 1f },
-				{ ItemType.Manufacture, 1f},
+				{ ItemType.Furnace, 1 },
+				{ ItemType.Manufacture, 1},	//new Number(3, 4)
 			};
 
 			Dictionary<ItemType, Dictionary<ItemType, Number>> buildingNeed = new Dictionary<ItemType, Dictionary<ItemType, Number>>();
@@ -189,7 +232,6 @@ namespace DysonRecipe
 				time = 1,
 				building = ItemType.Manufacture,
 			});
-
 
 			Dictionary<ItemType, Recipe> itemTypeToRecipes = new Dictionary<ItemType, Recipe>();
 			foreach (var recipe in recipes)
@@ -243,7 +285,8 @@ namespace DysonRecipe
 						{
 							buildingCount = new Number(0, 1);
 						}
-						var plusCount = recipe.time;
+						var tmpTime = recipe.time;
+						var plusCount = tmpTime.Mul(buildingEffective[recipe.building]);
 						plusCount.Mul(itemPack.count);
 						plusCount.Div(recipe.target.count);
 						dict[recipe.target.itemType] = buildingCount.Plus(plusCount);
@@ -259,6 +302,13 @@ namespace DysonRecipe
 			}
 
 			Console.WriteLine("目标：" + target + "个每秒");
+			Console.WriteLine();
+			Console.WriteLine("当前设备效率：");
+			foreach (var eff in buildingEffective)
+			{
+				Console.WriteLine(string.Format("\t{0} {1:0%}", GetItemName(eff.Key), eff.Value.ToFloat()));
+			}
+			Console.WriteLine();
 			Console.WriteLine("需求矿石：");
 			foreach (var itemPack in result)
 			{
@@ -266,12 +316,15 @@ namespace DysonRecipe
 				tmpItemPack.count.Mul(60);
 				Console.WriteLine("\t" + tmpItemPack + "个每分");
 			}
+			Console.WriteLine();
 			Console.WriteLine("需求设施：");
 			foreach (var pair in buildingNeed)
 			{
 				foreach (var pair2 in pair.Value)
 				{
-					Console.WriteLine("\t" + Program.GetItemName(pair.Key) + "(" + Program.GetItemName(pair2.Key) + ") " + pair2.Value);
+					var recipe = itemTypeToRecipes[pair2.Key];
+					Number effctive = buildingEffective[recipe.building];
+					Console.WriteLine("\t" + Program.GetItemName(pair.Key) + "(" + Program.GetItemName(pair2.Key) + ") " + pair2.Value + " " + recipe.ToSpeedString(effctive) );
 				}
 			}
 			Console.ReadLine();
