@@ -22,8 +22,14 @@ namespace DysonRecipe
 
 	public class Item
 	{
+		public Item(string name, ItemType itemType)
+		{
+			this.name = name;
+			this.itemType = itemType;
+		}
+
 		public string name;
-		public ItemType itemTyep;
+		public ItemType itemType;
 	}
 
 	public struct Number
@@ -112,7 +118,7 @@ namespace DysonRecipe
 
 		public override string ToString()
 		{
-			return itemType + " " + count;
+			return Program.GetItemName(itemType) + " " + count;
 		}
 
 		public ItemType itemType;
@@ -132,6 +138,16 @@ namespace DysonRecipe
 		static void Main(string[] args)
 		{
 			ItemPack target = new ItemPack(ItemType.MagnetCoil, 2);
+
+			items = new Dictionary<ItemType, Item>();
+			items.Add(ItemType.Copper, new Item("铜板", ItemType.Copper));
+			items.Add(ItemType.CopperOre, new Item("铜矿", ItemType.CopperOre));
+			items.Add(ItemType.IronOre, new Item("铁矿", ItemType.IronOre));
+			items.Add(ItemType.Iron, new Item("铁板", ItemType.Iron));
+			items.Add(ItemType.Magnet, new Item("磁铁", ItemType.Magnet));
+			items.Add(ItemType.MagnetCoil, new Item("磁铁线圈", ItemType.MagnetCoil));
+			items.Add(ItemType.Furnace, new Item("熔炉", ItemType.Furnace));
+			items.Add(ItemType.Manufacture, new Item("制作台", ItemType.Manufacture));
 
 			var buildingEffective = new Dictionary<ItemType, float>()
 			{
@@ -242,23 +258,39 @@ namespace DysonRecipe
 				}
 			}
 
-			Console.WriteLine("目标：" + target + "psec");
+			Console.WriteLine("目标：" + target + "个每秒");
 			Console.WriteLine("需求矿石：");
 			foreach (var itemPack in result)
 			{
 				var tmpItemPack = itemPack;
 				tmpItemPack.count.Mul(60);
-				Console.WriteLine(tmpItemPack + "pmin");
+				Console.WriteLine("\t" + tmpItemPack + "个每分");
 			}
 			Console.WriteLine("需求设施：");
 			foreach (var pair in buildingNeed)
 			{
 				foreach (var pair2 in pair.Value)
 				{
-					Console.WriteLine(pair.Key + " " + pair2.Key + " " + pair2.Value);
+					Console.WriteLine("\t" + Program.GetItemName(pair.Key) + "(" + Program.GetItemName(pair2.Key) + ") " + pair2.Value);
 				}
 			}
 			Console.ReadLine();
 		}
+
+		public static string GetItemName(ItemType itemType)
+		{
+			if (items == null)
+			{
+				return itemType.ToString();
+			}
+			Item item = null;
+			if (items.TryGetValue(itemType, out item))
+			{
+				return item.name;
+			}
+			return itemType.ToString();
+		}
+
+		private static Dictionary<ItemType, Item> items;
 	}
 }
