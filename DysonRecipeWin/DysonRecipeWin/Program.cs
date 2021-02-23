@@ -16,19 +16,22 @@ namespace DysonRecipeWin
 		static void Main()
 		{
 			Data.Load();
-			Calc();
+			Calc("石墨烯", 1);
 
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new Main());
 		}
 
-		static void Calc()
+		public static Dictionary<string, Number> buildingEffective;
+		public static Dictionary<string, Recipe> nameToRecipes;
+
+		public static BuildingNeed Calc(string itemName, int count)
 		{
 			//ItemPack target = new ItemPack("石墨烯", new Number(2, 3));
-			ItemPack target = new ItemPack("钛合金", 1);
+			ItemPack target = new ItemPack(itemName, count);
 
-			var buildingEffective = new Dictionary<string, Number>()
+			buildingEffective = new Dictionary<string, Number>()
 			{
 				{ "电弧熔炉", 1 },
 				{ "制造台", new Number(1, 1)},
@@ -38,7 +41,7 @@ namespace DysonRecipeWin
 
 			BuildingNeed first = null;
 
-			Dictionary<string, Recipe> nameToRecipes = new Dictionary<string, Recipe>();
+			nameToRecipes = new Dictionary<string, Recipe>();
 			foreach (var recipe in Data.recipes)
 			{
 				if (!nameToRecipes.ContainsKey(recipe.target.name))
@@ -58,7 +61,7 @@ namespace DysonRecipeWin
 				if (tmpCount > 1000)
 				{
 					Console.WriteLine("失败，配方产生了循环");
-					return;
+					return null;
 				}
 				var buildingPack = tmp[0];
 				if (!nameToRecipes.ContainsKey(buildingPack.itemPack.name))
@@ -118,6 +121,7 @@ namespace DysonRecipeWin
 			Console.WriteLine("需求设施：");
 			PrintBuildingNeed(first, nameToRecipes, buildingEffective);
 			Console.ReadLine();
+			return first;
 		}
 
 		static void PrintBuildingNeed(BuildingNeed need, Dictionary<string, Recipe> nameToRecipes, Dictionary<string, Number> buildingEffective)
@@ -131,7 +135,7 @@ namespace DysonRecipeWin
 			}
 		}
 
-		static string Tab(int count)
+		public static string Tab(int count)
 		{
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < count; i++)
