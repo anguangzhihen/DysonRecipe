@@ -131,7 +131,7 @@
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.RecipeList);
 			this.Name = "Main";
-			this.Text = "戴森球量化工具";
+			this.Text = "暗光的戴森球量化工具";
 			this.Load += new System.EventHandler(this.Form1_Load);
 			((System.ComponentModel.ISupportInitialize)(this.NumChoose)).EndInit();
 			this.ResumeLayout(false);
