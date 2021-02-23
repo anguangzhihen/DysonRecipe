@@ -80,7 +80,7 @@ namespace DysonRecipeWin
             var newTime = time / effective;
             StringBuilder sb = new StringBuilder();
             sb.Append("[ ");
-            sb.Append(target.ToSpeedString(newTime));
+            sb.Append(target.ToSpeedString(newTime, false));
             sb.Append(" ← ");
             bool first = true;
             foreach (var need in needs)
@@ -91,12 +91,12 @@ namespace DysonRecipeWin
                 }
                 else
                 {
-                    sb.Append(" | ");
+                    sb.Append(" ");
                 }
 
                 sb.Append(need.ToSpeedString(newTime));
             }
-            sb.Append("]");
+            sb.Append(" ]");
             return sb.ToString();
         }
 
@@ -125,9 +125,14 @@ namespace DysonRecipeWin
             return name + " " + count;
         }
 
-        public string ToSpeedString(Number time)
+        public string ToSpeedString(Number time, bool needName = true)
         {
-            return string.Format("{0} {1:0.00}个每秒", name, CalcSpeed(time));
+            if (!needName)
+            {
+                return string.Format("{0:0.##}", CalcSpeed(time));
+            }
+
+            return string.Format("{0:0.##}{1}", CalcSpeed(time), name);
         }
 
         public string name;

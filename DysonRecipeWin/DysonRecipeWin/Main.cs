@@ -56,7 +56,9 @@ namespace DysonRecipeWin
 
 			ResultTreeView.Nodes.Clear();
 			var need = Program.Calc(RecipeList.SelectedItem.ToString(), (int)NumChoose.Value);
-			ResultTreeView.Nodes.Add(GetTreeNode(need));
+		    var root = GetTreeNode(need);
+            root.ExpandAll();
+            ResultTreeView.Nodes.Add(root);
 		}
 
 		TreeNode GetTreeNode(BuildingNeed need)
@@ -68,7 +70,7 @@ namespace DysonRecipeWin
 			}
 			var recipe = Program.nameToRecipes[need.itemName];
 			Number effctive = Program.buildingEffective[recipe.building];
-			string value = need.building + "(" + need.itemName + ") " + need.count + " " + recipe.ToSpeedString(effctive);
+			string value = need.count + " " + need.building + "(" + need.itemName + ") " + recipe.ToSpeedString(effctive);
 			TreeNode now = new TreeNode(value, treeChilds.ToArray());
 			return now;
 		}
@@ -78,5 +80,10 @@ namespace DysonRecipeWin
 		{
 
 		}
-	}
+
+        private void NumChoose_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+    }
 }

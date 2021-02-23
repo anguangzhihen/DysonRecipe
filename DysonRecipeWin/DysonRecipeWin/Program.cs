@@ -37,6 +37,7 @@ namespace DysonRecipeWin
 				{ "制造台", new Number(1, 1)},
 				{ "化工厂", 1 },
 				{ "微型粒子对撞器", 1 },
+                { "矩阵研究站", 1 },
 			};
 
 			BuildingNeed first = null;
