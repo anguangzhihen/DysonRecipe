@@ -83,9 +83,32 @@ namespace DysonRecipeWin
 						count = buildingCount,
 						level = buildingPack.parent == null ? 1 : (buildingPack.parent.level + 1),
 					};
+
+					// 额外信息
+					foreach (var recipeNeed in recipe.needs)
+					{
+						if (Data.oreNames.Contains(recipeNeed.name))
+						{
+							var needEff = recipeNeed.count * buildingPack.itemPack.count;
+							needEff.num *= 60;
+							var extraInfo = string.Format("{0}{1}/min", recipeNeed.name, needEff.ToFloatString());
+							buildingNeed.AppendInfo(extraInfo);
+						}
+						if (Data.liquidNames.Contains(recipeNeed.name))
+						{
+							var needEff = recipeNeed.count * buildingPack.itemPack.count;
+							var extraInfo = string.Format("{0}{1}/s", recipeNeed.name, needEff.ToFloatString());
+							buildingNeed.AppendInfo(extraInfo);
+						}
+					}
+
 					if (buildingPack.parent != null)
 					{
 						buildingPack.parent.childs.Add(buildingNeed);
+						if (buildingPack.parent.extraInfo.Length != 0)
+						{
+							buildingPack.parent.ClearExtraInfo();
+						}
 					}
 					if (first == null)
 					{
@@ -129,7 +152,7 @@ namespace DysonRecipeWin
 		{
 			var recipe = nameToRecipes[need.itemName];
 			Number effctive = buildingEffective[recipe.building];
-			Console.WriteLine(Tab(need.level) + "|--" + need.building + "(" + need.itemName + ") " + need.count + " " + recipe.ToSpeedString(effctive));
+			Console.WriteLine(Tab(need.level) + "|--" + ResultString(need));
 			foreach (var child in need.childs)
 			{
 				PrintBuildingNeed(child, nameToRecipes, buildingEffective);
@@ -144,6 +167,14 @@ namespace DysonRecipeWin
 				sb.Append("    ");
 			}
 			return sb.ToString();
+		}
+
+		public static string ResultString(BuildingNeed need)
+		{
+			var recipe = Program.nameToRecipes[need.itemName];
+			Number effctive = Program.buildingEffective[recipe.building];
+			string value = need.count + " " + need.building + "(" + need.itemName + ") " + recipe.ToSpeedString(effctive) + " " + need.extraInfo;
+			return value;
 		}
 	}
 }

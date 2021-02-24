@@ -65,11 +65,26 @@ namespace DysonRecipeWin
                     }
                 }
             }
-        }
 
-        public static List<Recipe> recipes = new List<Recipe>();
+	        oreNames.Clear();
+	        oreNames.Add("铁矿");
+	        oreNames.Add("铜矿");
+	        oreNames.Add("硅石");
+	        oreNames.Add("钛石");
+	        oreNames.Add("石矿");
+	        oreNames.Add("煤矿");
 
-        public static string RECIPES_FILE_PATH = Directory.GetCurrentDirectory() + "/data/Recipes.xlsx";
+	        liquidNames.Clear();
+			liquidNames.Add("水");
+			liquidNames.Add("原油");
+		}
+
+		public static List<Recipe> recipes = new List<Recipe>();
+	    public static List<string> oreNames = new List<string>();
+		public static List<string> liquidNames = new List<string>();
+
+
+		public static string RECIPES_FILE_PATH = Directory.GetCurrentDirectory() + "/data/Recipes.xlsx";
 
     }
 

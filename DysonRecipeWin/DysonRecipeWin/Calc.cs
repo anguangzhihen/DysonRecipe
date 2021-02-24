@@ -103,15 +103,39 @@ namespace DysonRecipeWin
 		{
 			return (float)num / dividedNum;
 		}
+
+		public string ToFloatString()
+		{
+			return string.Format("{0:0.##}", ToFloat());
+		}
 	}
 
 	public class BuildingNeed
 	{
+		public void AppendInfo(string info)
+		{
+			if (extraInfo.Length != 0)
+			{
+				extraInfo.Append(" ");
+			}
+			else
+			{
+				extraInfo.Append("采集：");
+			}
+			extraInfo.Append(info);
+		}
+
+		public void ClearExtraInfo()
+		{
+			extraInfo.Clear();
+		}
+
 		public string building;
 		public string itemName;
 		public Number count;
 		public List<BuildingNeed> childs = new List<BuildingNeed>();
 		public int level;
+		public StringBuilder extraInfo = new StringBuilder();
 	}
 
 	public class BuildingTargetPack

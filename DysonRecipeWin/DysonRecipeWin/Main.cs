@@ -68,10 +68,7 @@ namespace DysonRecipeWin
 			{
 				treeChilds.Add(GetTreeNode(child));
 			}
-			var recipe = Program.nameToRecipes[need.itemName];
-			Number effctive = Program.buildingEffective[recipe.building];
-			string value = need.count + " " + need.building + "(" + need.itemName + ") " + recipe.ToSpeedString(effctive);
-			TreeNode now = new TreeNode(value, treeChilds.ToArray());
+			TreeNode now = new TreeNode(Program.ResultString(need), treeChilds.ToArray());
 			return now;
 		}
 
