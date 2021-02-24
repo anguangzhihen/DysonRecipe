@@ -55,7 +55,14 @@ namespace DysonRecipeWin
 			Console.WriteLine(RecipeList.SelectedItem + " " + NumChoose.Value);
 
 			ResultTreeView.Nodes.Clear();
-			var need = Program.Calc(RecipeList.SelectedItem.ToString(), (int)NumChoose.Value);
+
+		    Number num = (int) NumChoose.Value;
+		    var itemName = RecipeList.SelectedItem.ToString();
+            if (deviceToggle.Checked)
+            {
+                num *= Data.nameToRecipes[itemName].target.count;
+            }
+            var need = Program.Calc(itemName, num);
 		    var root = GetTreeNode(need);
             root.ExpandAll();
             ResultTreeView.Nodes.Add(root);

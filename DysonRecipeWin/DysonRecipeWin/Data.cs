@@ -73,10 +73,10 @@ namespace DysonRecipeWin
 	        oreNames.Add("钛石");
 	        oreNames.Add("石矿");
 	        oreNames.Add("煤矿");
+            oreNames.Add("水");
+            oreNames.Add("原油");
 
-	        liquidNames.Clear();
-			liquidNames.Add("水");
-			liquidNames.Add("原油");
+            liquidNames.Clear();
 
 	        buildingEffective = new Dictionary<string, Number>()
 	        {
@@ -96,7 +96,8 @@ namespace DysonRecipeWin
 			        nameToRecipes[recipe.target.name] = recipe;
 		        }
 	        }
-		}
+            nameToRecipes.Remove("硅石");
+        }
 
 		public static List<Recipe> recipes = new List<Recipe>();
 	    public static List<string> oreNames = new List<string>();

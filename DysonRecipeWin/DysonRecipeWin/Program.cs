@@ -25,15 +25,12 @@ namespace DysonRecipeWin
 
 
 
-		public static BuildingNeed Calc(string itemName, int count)
+		public static BuildingNeed Calc(string itemName, Number count)
 		{
 			//ItemPack target = new ItemPack("石墨烯", new Number(2, 3));
 			ItemPack target = new ItemPack(itemName, count);
 
-
-
 			BuildingNeed first = null;
-
 
 			List<BuildingTargetPack> tmp = new List<BuildingTargetPack>();
 			List<ItemPack> result = new List<ItemPack>();
@@ -155,7 +152,7 @@ namespace DysonRecipeWin
 		{
 			var recipe = Data.nameToRecipes[need.itemName];
 			Number effctive = Data.buildingEffective[recipe.building];
-			string value = need.count + " " + need.building + "(" + need.itemName + ") " + recipe.ToSpeedString(effctive) + " " + need.extraInfo;
+			string value = need.count.ToFloatString() + " " + need.building + "(" + need.itemName + ") " + recipe.ToSpeedString(effctive) + " " + need.extraInfo;
 			return value;
 		}
 	}
