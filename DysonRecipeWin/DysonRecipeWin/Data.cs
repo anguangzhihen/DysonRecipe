@@ -77,12 +77,32 @@ namespace DysonRecipeWin
 	        liquidNames.Clear();
 			liquidNames.Add("水");
 			liquidNames.Add("原油");
+
+	        buildingEffective = new Dictionary<string, Number>()
+	        {
+		        { "电弧熔炉", 1 },
+		        { "制造台", new Number(1, 1)},
+		        { "化工厂", 1 },
+		        { "微型粒子对撞器", 1 },
+		        { "矩阵研究站", 1 },
+				{ "原油精炼机", 1 },
+	        };
+
+	        nameToRecipes = new Dictionary<string, Recipe>();
+	        foreach (var recipe in Data.recipes)
+	        {
+		        if (!nameToRecipes.ContainsKey(recipe.target.name))
+		        {
+			        nameToRecipes[recipe.target.name] = recipe;
+		        }
+	        }
 		}
 
 		public static List<Recipe> recipes = new List<Recipe>();
 	    public static List<string> oreNames = new List<string>();
 		public static List<string> liquidNames = new List<string>();
-
+	    public static Dictionary<string, Number> buildingEffective;
+	    public static Dictionary<string, Recipe> nameToRecipes;
 
 		public static string RECIPES_FILE_PATH = Directory.GetCurrentDirectory() + "/data/Recipes.xlsx";
 

@@ -23,33 +23,17 @@ namespace DysonRecipeWin
 			Application.Run(new Main());
 		}
 
-		public static Dictionary<string, Number> buildingEffective;
-		public static Dictionary<string, Recipe> nameToRecipes;
+
 
 		public static BuildingNeed Calc(string itemName, int count)
 		{
 			//ItemPack target = new ItemPack("石墨烯", new Number(2, 3));
 			ItemPack target = new ItemPack(itemName, count);
 
-			buildingEffective = new Dictionary<string, Number>()
-			{
-				{ "电弧熔炉", 1 },
-				{ "制造台", new Number(1, 1)},
-				{ "化工厂", 1 },
-				{ "微型粒子对撞器", 1 },
-                { "矩阵研究站", 1 },
-			};
+
 
 			BuildingNeed first = null;
 
-			nameToRecipes = new Dictionary<string, Recipe>();
-			foreach (var recipe in Data.recipes)
-			{
-				if (!nameToRecipes.ContainsKey(recipe.target.name))
-				{
-					nameToRecipes[recipe.target.name] = recipe;
-				}
-			}
 
 			List<BuildingTargetPack> tmp = new List<BuildingTargetPack>();
 			List<ItemPack> result = new List<ItemPack>();
@@ -65,16 +49,16 @@ namespace DysonRecipeWin
 					return null;
 				}
 				var buildingPack = tmp[0];
-				if (!nameToRecipes.ContainsKey(buildingPack.itemPack.name))
+				if (!Data.nameToRecipes.ContainsKey(buildingPack.itemPack.name))
 				{
 					result.Add(tmp[0].itemPack);
 					tmp.RemoveAt(0);
 				}
 				else
 				{
-					var recipe = nameToRecipes[buildingPack.itemPack.name];
-					var buildingCount = recipe.time / buildingEffective[recipe.building];
-					buildingCount = buildingCount * buildingPack.itemPack.count / recipe.target.count;
+					var recipe = Data.nameToRecipes[buildingPack.itemPack.name];
+					var time = recipe.time / Data.buildingEffective[recipe.building];
+					var buildingCount = time * buildingPack.itemPack.count / recipe.target.count;
 
 					var buildingNeed = new BuildingNeed()
 					{
@@ -89,14 +73,14 @@ namespace DysonRecipeWin
 					{
 						if (Data.oreNames.Contains(recipeNeed.name))
 						{
-							var needEff = recipeNeed.count * buildingPack.itemPack.count;
+							var needEff = recipeNeed.count * buildingCount / time;
 							needEff.num *= 60;
 							var extraInfo = string.Format("{0}{1}/min", recipeNeed.name, needEff.ToFloatString());
 							buildingNeed.AppendInfo(extraInfo);
 						}
 						if (Data.liquidNames.Contains(recipeNeed.name))
 						{
-							var needEff = recipeNeed.count * buildingPack.itemPack.count;
+							var needEff = recipeNeed.count * buildingCount / time;
 							var extraInfo = string.Format("{0}{1}/s", recipeNeed.name, needEff.ToFloatString());
 							buildingNeed.AppendInfo(extraInfo);
 						}
@@ -129,7 +113,7 @@ namespace DysonRecipeWin
 			Console.WriteLine("目标：" + target + "个每秒");
 			Console.WriteLine();
 			Console.WriteLine("当前设备效率：");
-			foreach (var eff in buildingEffective)
+			foreach (var eff in Data.buildingEffective)
 			{
 				Console.WriteLine(string.Format(Tab(1) + "{0} {1:0%}", eff.Key, eff.Value.ToFloat()));
 			}
@@ -143,19 +127,17 @@ namespace DysonRecipeWin
 			}
 			Console.WriteLine();
 			Console.WriteLine("需求设施：");
-			PrintBuildingNeed(first, nameToRecipes, buildingEffective);
+			PrintBuildingNeed(first);
 			Console.ReadLine();
 			return first;
 		}
 
-		static void PrintBuildingNeed(BuildingNeed need, Dictionary<string, Recipe> nameToRecipes, Dictionary<string, Number> buildingEffective)
+		static void PrintBuildingNeed(BuildingNeed need)
 		{
-			var recipe = nameToRecipes[need.itemName];
-			Number effctive = buildingEffective[recipe.building];
 			Console.WriteLine(Tab(need.level) + "|--" + ResultString(need));
 			foreach (var child in need.childs)
 			{
-				PrintBuildingNeed(child, nameToRecipes, buildingEffective);
+				PrintBuildingNeed(child);
 			}
 		}
 
@@ -171,8 +153,8 @@ namespace DysonRecipeWin
 
 		public static string ResultString(BuildingNeed need)
 		{
-			var recipe = Program.nameToRecipes[need.itemName];
-			Number effctive = Program.buildingEffective[recipe.building];
+			var recipe = Data.nameToRecipes[need.itemName];
+			Number effctive = Data.buildingEffective[recipe.building];
 			string value = need.count + " " + need.building + "(" + need.itemName + ") " + recipe.ToSpeedString(effctive) + " " + need.extraInfo;
 			return value;
 		}
