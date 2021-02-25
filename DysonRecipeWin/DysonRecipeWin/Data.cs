@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using OfficeOpenXml;
 
 namespace DysonRecipeWin
@@ -12,8 +10,27 @@ namespace DysonRecipeWin
     {
         public static void Load()
         {
-            recipes.Clear();
-            using (ExcelPackage excelPackage = new ExcelPackage(new FileInfo(RECIPES_FILE_PATH)))
+	        oreNames.Clear();
+	        oreNames.Add("铁矿");
+	        oreNames.Add("铜矿");
+	        oreNames.Add("硅石");
+	        oreNames.Add("钛石");
+	        oreNames.Add("石矿");
+	        oreNames.Add("煤矿");
+	        oreNames.Add("水");
+	        oreNames.Add("原油");
+
+			recipes.Clear();
+	        foreach (var oreName in oreNames)
+	        {
+		        var recipe = new Recipe();
+		        recipe.target = new ItemPack(oreName, 1);
+		        recipe.isGather = true;
+		        recipe.building = "采集";
+		        recipe.time = 1;
+		        recipes.Add(recipe);
+	        }
+			using (ExcelPackage excelPackage = new ExcelPackage(new FileInfo(RECIPES_FILE_PATH)))
             {
                 ExcelWorksheet sheet = excelPackage.Workbook.Worksheets[1];
 
@@ -66,16 +83,6 @@ namespace DysonRecipeWin
                 }
             }
 
-	        oreNames.Clear();
-	        oreNames.Add("铁矿");
-	        oreNames.Add("铜矿");
-	        oreNames.Add("硅石");
-	        oreNames.Add("钛石");
-	        oreNames.Add("石矿");
-	        oreNames.Add("煤矿");
-            oreNames.Add("水");
-            oreNames.Add("原油");
-
 	        buildingEffective = new Dictionary<string, Number>()
 	        {
 		        { "电弧熔炉", 1 },
@@ -87,30 +94,23 @@ namespace DysonRecipeWin
 				{ "采集", 1 },
 			};
 
-	        nameToRecipes = new Dictionary<string, Recipe>();
+	        nameToRecipes = new Dictionary<string, List<Recipe>>();
 	        foreach (var recipe in Data.recipes)
 	        {
 		        if (!nameToRecipes.ContainsKey(recipe.target.name))
 		        {
-			        nameToRecipes[recipe.target.name] = recipe;
+			        nameToRecipes[recipe.target.name] = new List<Recipe>();
 		        }
+				nameToRecipes[recipe.target.name].Add(recipe);
 	        }
-	        foreach (var oreName in oreNames)
-	        {
-		        var recipe = new Recipe();
-		        recipe.target = new ItemPack(oreName, 1);
-		        recipe.isGather = true;
-		        recipe.building = "采集";
-		        recipe.time = 1;
-				nameToRecipes[oreName] = recipe;
-	        }
-			nameToRecipes.Remove("硅石");
         }
+
+		public static Save save = new Save();
 
 		public static List<Recipe> recipes = new List<Recipe>();
 	    public static List<string> oreNames = new List<string>();
 	    public static Dictionary<string, Number> buildingEffective;
-	    public static Dictionary<string, Recipe> nameToRecipes;
+	    public static Dictionary<string, List<Recipe>> nameToRecipes;
 
 		public static string RECIPES_FILE_PATH = Directory.GetCurrentDirectory() + "/data/Recipes.xlsx";
 
@@ -195,4 +195,16 @@ namespace DysonRecipeWin
         public string name;
         public Number count;
     }
+
+	public class Save
+	{
+		
+	}
+
+	public class NodeSave
+	{
+		public int depth;
+		public int index;
+		public int recipeIndex;
+	}
 }

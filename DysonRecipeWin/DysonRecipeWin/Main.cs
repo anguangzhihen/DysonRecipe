@@ -54,15 +54,43 @@ namespace DysonRecipeWin
             {
                 num *= Data.nameToRecipes[itemName].target.count;
             }
-
-			ResultTreeView.Nodes.AddRange(RecipeTreeNode.Calc(itemName, num).ToArray());
+			var arr = RecipeTreeNode.Calc(itemName, num).ToArray();
+			ResultTreeView.Nodes.AddRange(arr);
 			ResultTreeView.ExpandAll();
+
+			foreach (var recipeTreeNode in arr)
+			{
+				FoldGatherNode(recipeTreeNode);
+			}
 		}
-		
+
+		void FoldGatherNode(RecipeTreeNode node)
+		{
+			bool hasGather = false;
+			foreach (var child in node.Nodes)
+			{
+				if (child is RecipeTreeNode && ((RecipeTreeNode) child).recipe.isGather)
+				{
+					hasGather = true;
+					break;
+				}
+			}
+			if(hasGather)
+				node.Toggle();
+
+			foreach (var child in node.Nodes)
+			{
+				if (child is RecipeTreeNode)
+				{
+					FoldGatherNode(((RecipeTreeNode)child));
+				}
+			}
+		}
+
 
 		private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
 		{
-
+			Console.WriteLine(sender + " " + e.ToString());
 		}
 
         private void NumChoose_ValueChanged(object sender, EventArgs e)
