@@ -126,21 +126,22 @@ namespace DysonRecipeWin
 				{
 					if (Data.oreNames.Contains(recipeNeed.name))
 					{
-						var needEff = recipeNeed.count * buildingCount / parentTime;
+						var needEff = recipeNeed.count * buildingCount / recipe.time;
 						needEff.num *= 60;
 						var extraInfo = string.Format("{0}{1}/min", recipeNeed.name, needEff.ToFloatString());
-						AppendInfo(extraInfo);
-					}
-					if (Data.liquidNames.Contains(recipeNeed.name))
-					{
-						var needEff = recipeNeed.count * buildingCount / parentTime;
-						var extraInfo = string.Format("{0}{1}/s", recipeNeed.name, needEff.ToFloatString());
 						AppendInfo(extraInfo);
 					}
 				}
 			}
 
-			Text = GetResultString();
+			if (recipe.isGather)
+			{
+				Text = GetGatherResultString();
+			}
+			else
+			{
+				Text = GetResultString();
+			}
 
 			foreach (var node in Nodes)
 			{
@@ -163,6 +164,11 @@ namespace DysonRecipeWin
 			Number effctive = Data.buildingEffective[recipe.building];
 			string value = buildingCount.ToFloatString() + " " + building + "(" + itemName + ") " + recipe.ToSpeedString(effctive) + " " + extraInfo;
 			return value;
+		}
+
+		public string GetGatherResultString()
+		{
+			return string.Format("{0}{1}/min", itemName, (buildingCount * 60).ToFloatString());
 		}
 
 		public void AppendInfo(string info)
