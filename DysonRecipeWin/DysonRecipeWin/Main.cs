@@ -1,13 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using OfficeOpenXml.ConditionalFormatting;
 
 namespace DysonRecipeWin
 {
@@ -62,23 +54,11 @@ namespace DysonRecipeWin
             {
                 num *= Data.nameToRecipes[itemName].target.count;
             }
-            var need = Program.Calc(itemName, num);
-		    var root = GetTreeNode(need);
-            root.ExpandAll();
-            ResultTreeView.Nodes.Add(root);
-		}
 
-		TreeNode GetTreeNode(BuildingNeed need)
-		{
-			List<TreeNode> treeChilds = new List<TreeNode>();
-			foreach (var child in need.childs)
-			{
-				treeChilds.Add(GetTreeNode(child));
-			}
-			TreeNode now = new TreeNode(Program.ResultString(need), treeChilds.ToArray());
-			return now;
+			ResultTreeView.Nodes.AddRange(RecipeTreeNode.Calc(itemName, num).ToArray());
+			ResultTreeView.ExpandAll();
 		}
-
+		
 
 		private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
 		{

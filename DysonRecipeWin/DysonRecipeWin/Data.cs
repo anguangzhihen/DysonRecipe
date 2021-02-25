@@ -136,6 +136,19 @@ namespace DysonRecipeWin
             return sb.ToString();
         }
 
+	    public Number GetNeedCount(string itemName)
+	    {
+		    foreach (var need in needs)
+		    {
+			    if (need.name == itemName)
+			    {
+				    return need.count;
+			    }
+		    }
+			Console.WriteLine("没有找到itemName");
+		    return 0;
+	    }
+
         public ItemPack target;
         public List<ItemPack> needs = new List<ItemPack>();
         public Number time;
