@@ -122,6 +122,7 @@ namespace DysonRecipeWin
 				SetItemNeedCount(needCount);
 
 				// 额外信息
+				ClearExtraInfo();
 				foreach (var recipeNeed in recipe.needs)
 				{
 					if (Data.oreNames.Contains(recipeNeed.name))
@@ -167,7 +168,7 @@ namespace DysonRecipeWin
 
 		public string GetGatherResultString()
 		{
-			return string.Format("{0}{1}/min", itemName, (buildingCount * 60).ToFloatString());
+			return string.Format("采集：{0}{1}/min", itemName, (buildingCount * 60).ToFloatString());
 		}
 
 		public void AppendInfo(string info)
@@ -186,6 +187,12 @@ namespace DysonRecipeWin
 		public void ClearExtraInfo()
 		{
 			extraInfo.Clear();
+		}
+
+		public void SetAndSaveRecipeIndex(int recipeIndex)
+		{
+			Data.save.SetNodeIndex(itemName, depth, index, recipeIndex);
+			Calc();
 		}
 
 		public string itemName;

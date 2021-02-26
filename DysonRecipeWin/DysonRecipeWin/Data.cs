@@ -129,6 +129,16 @@ namespace DysonRecipeWin
 			return recipes[recipeIndex];
 	    }
 
+	    public static List<Recipe> GetRecipes(string itemName)
+	    {
+		    List<Recipe> result;
+		    if (nameToRecipes.TryGetValue(itemName, out result))
+		    {
+			    return result;
+		    }
+		    return null;
+	    }
+
 		public static Save save = new Save();
 
 		public static List<Recipe> recipes = new List<Recipe>();

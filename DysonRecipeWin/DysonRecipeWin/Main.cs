@@ -90,12 +90,40 @@ namespace DysonRecipeWin
 
 		private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
 		{
-			Console.WriteLine(sender + " " + e.ToString());
+			if (e.Node is RecipeTreeNode)
+			{
+				recipeIndexChoose.Items.Clear();
+				chosenRecipeTreeNode = (RecipeTreeNode) e.Node;
+				var recipes = Data.GetRecipes(chosenRecipeTreeNode.itemName);
+				foreach (var recipe in recipes)
+				{
+					recipeIndexChoose.Items.Add(recipe.displayName);
+				}
+			}
 		}
 
         private void NumChoose_ValueChanged(object sender, EventArgs e)
         {
-
         }
-    }
+
+		private void recipeIndexChoose_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			Console.WriteLine("sender: " + sender + " e: " + e);
+			if (recipeIndexChoose.SelectedIndex < 0)
+			{
+				Console.WriteLine("recipeIndexChoose.SelectedIndex < 0");
+				return;
+			}
+			if (chosenRecipeTreeNode == null)
+			{
+				Console.WriteLine("chosenRecipeTreeNode == null");
+				return;
+			}
+
+			chosenRecipeTreeNode.SetAndSaveRecipeIndex(recipeIndexChoose.SelectedIndex);
+
+		}
+
+		private RecipeTreeNode chosenRecipeTreeNode = null;
+	}
 }
