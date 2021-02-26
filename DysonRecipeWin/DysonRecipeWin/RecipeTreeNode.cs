@@ -115,7 +115,7 @@ namespace DysonRecipeWin
 				var parent = (RecipeTreeNode)Parent;
 
 				// 计算需求数
-				var parentRecipe = Data.nameToRecipes[parent.itemName];
+				var parentRecipe = parent.recipe;
 				var parentTime = parentRecipe.time / Data.buildingEffective[parentRecipe.building];
 				var needCount = parent.buildingCount * parentRecipe.GetNeedCount(itemName) / parentTime;
 
@@ -160,7 +160,6 @@ namespace DysonRecipeWin
 
 		public string GetResultString()
 		{
-			var recipe = Data.nameToRecipes[itemName];
 			Number effctive = Data.buildingEffective[recipe.building];
 			string value = buildingCount.ToFloatString() + " " + building + "(" + itemName + ") " + recipe.ToSpeedString(effctive) + " " + extraInfo;
 			return value;
@@ -200,7 +199,31 @@ namespace DysonRecipeWin
 
 		public Recipe recipe
 		{
-			get { return Data.nameToRecipes[itemName]; }
+			get { return Data.GetRecipe(itemName, depth, index); }
+		}
+
+		public int index
+		{
+			get
+			{
+				if (Parent == null || !(Parent is RecipeTreeNode))
+				{
+					return 0;
+				}
+				return Parent.Nodes.IndexOf(this);
+			}
+		}
+
+		public int depth
+		{
+			get
+			{
+				if (Parent == null || !(Parent is RecipeTreeNode))
+				{
+					return 0;
+				}
+				return ((RecipeTreeNode) Parent).depth + 1;
+			}
 		}
 
 		public StringBuilder extraInfo = new StringBuilder();

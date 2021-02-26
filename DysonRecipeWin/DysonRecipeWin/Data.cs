@@ -28,6 +28,7 @@ namespace DysonRecipeWin
 		        recipe.isGather = true;
 		        recipe.building = "采集";
 		        recipe.time = 1;
+		        recipe.displayName = oreName + "（采集）";
 		        recipes.Add(recipe);
 	        }
 			using (ExcelPackage excelPackage = new ExcelPackage(new FileInfo(RECIPES_FILE_PATH)))
@@ -61,7 +62,22 @@ namespace DysonRecipeWin
                             needs.Add(row.Split(':'));
                         }
                         Recipe recipe = new Recipe();
-                        recipe.target = new ItemPack(name, new Number(count));
+
+
+
+	                    string itemName = null;
+	                    if (name.Contains("（"))
+	                    {
+		                    itemName = name.Substring(0, name.IndexOf("（"));
+	                    }
+	                    else
+	                    {
+		                    itemName = name;
+	                    }
+	                    itemName = itemName.Trim();
+
+						recipe.target = new ItemPack(itemName, new Number(count));
+	                    recipe.displayName = name;
                         foreach (var need in needs)
                         {
                             recipe.needs.Add(new ItemPack(need[0], new Number(need[1])));
@@ -104,6 +120,14 @@ namespace DysonRecipeWin
 				nameToRecipes[recipe.target.name].Add(recipe);
 	        }
         }
+
+	    public static Recipe GetRecipe(string itemName, int depth, int index)
+	    {
+		    var recipeIndex = save.GetNodeIndex(itemName, depth, index);
+		    var recipes = nameToRecipes[itemName];
+		    recipeIndex = Math.Min(Math.Max(recipeIndex, 0), recipes.Count);
+			return recipes[recipeIndex];
+	    }
 
 		public static Save save = new Save();
 
@@ -156,12 +180,22 @@ namespace DysonRecipeWin
 		    return 0;
 	    }
 
+	    public string GetDisplayName()
+	    {
+		    if (string.IsNullOrEmpty(displayName))
+		    {
+			    return target.name;
+		    }
+		    return displayName;
+	    }
+
         public ItemPack target;
         public List<ItemPack> needs = new List<ItemPack>();
         public Number time;
         public string building;
         public int level;
 	    public bool isGather = false;	// 采集
+	    public string displayName;
     }
 
     public struct ItemPack
@@ -198,7 +232,71 @@ namespace DysonRecipeWin
 
 	public class Save
 	{
-		
+		public int GetNodeIndex(string itemName, int depth, int index)
+		{
+			foreach (var recipeSave in recipeSaves)
+			{
+				if (recipeSave.itemName != itemName)
+				{
+					continue;
+				}
+
+				foreach (var nodeSave in recipeSave.nodeSaves)
+				{
+					if (nodeSave.depth == depth && nodeSave.index == index)
+					{
+						return nodeSave.index;
+					}
+				}
+			}
+			return 0;
+		}
+
+		public void SetNodeIndex(string itemName, int depth, int index, int recipeIndex)
+		{
+			RecipeSave recipeSave = null;
+			NodeSave nodeSave = null;
+			foreach (var rs in recipeSaves)
+			{
+				if (rs.itemName == itemName)
+				{
+					recipeSave = rs;
+					break;
+				}
+			}
+
+			if (recipeSave == null)
+			{
+				recipeSave = new RecipeSave();
+				recipeSave.itemName = itemName;
+				recipeSaves.Add(recipeSave);
+			}
+
+			foreach (var ns in recipeSave.nodeSaves)
+			{
+				if (ns.depth == depth && ns.index == index)
+				{
+					nodeSave = ns;
+					break;
+				}
+			}
+
+			if (nodeSave == null)
+			{
+				nodeSave = new NodeSave();
+				nodeSave.index = index;
+				nodeSave.depth = depth;
+			}
+			nodeSave.recipeIndex = recipeIndex;
+		}
+
+		public List<RecipeSave> recipeSaves = new List<RecipeSave>();
+	}
+
+	public class RecipeSave
+	{
+		public string itemName;
+		public List<NodeSave> nodeSaves = new List<NodeSave>();
 	}
 
 	public class NodeSave

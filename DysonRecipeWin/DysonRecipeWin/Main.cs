@@ -52,7 +52,7 @@ namespace DysonRecipeWin
 		    var itemName = RecipeList.SelectedItem.ToString();
             if (deviceToggle.Checked)
             {
-                num *= Data.nameToRecipes[itemName].target.count;
+                num *= Data.GetRecipe(itemName, 0, 0).target.count;
             }
 			var arr = RecipeTreeNode.Calc(itemName, num).ToArray();
 			ResultTreeView.Nodes.AddRange(arr);
