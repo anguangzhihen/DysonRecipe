@@ -28,7 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("节点0");
+			System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("节点0");
 			this.RecipeList = new System.Windows.Forms.ListBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.button1 = new System.Windows.Forms.Button();
@@ -40,6 +40,7 @@
 			this.deviceToggle = new System.Windows.Forms.RadioButton();
 			this.recipeIndexChoose = new System.Windows.Forms.ComboBox();
 			this.label2 = new System.Windows.Forms.Label();
+			this.RecipeContent = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.NumChoose)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -99,10 +100,10 @@
 			this.ResultTreeView.Font = new System.Drawing.Font("宋体", 10F);
 			this.ResultTreeView.Location = new System.Drawing.Point(175, 44);
 			this.ResultTreeView.Name = "ResultTreeView";
-			treeNode1.Name = "节点0";
-			treeNode1.Text = "节点0";
+			treeNode2.Name = "节点0";
+			treeNode2.Text = "节点0";
 			this.ResultTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1});
+            treeNode2});
 			this.ResultTreeView.Size = new System.Drawing.Size(569, 394);
 			this.ResultTreeView.TabIndex = 5;
 			this.ResultTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
@@ -170,11 +171,23 @@
 			this.label2.TabIndex = 11;
 			this.label2.Text = "选择配方";
 			// 
+			// RecipeContent
+			// 
+			this.RecipeContent.AutoSize = true;
+			this.RecipeContent.Font = new System.Drawing.Font("宋体", 10F);
+			this.RecipeContent.Location = new System.Drawing.Point(172, 480);
+			this.RecipeContent.Name = "RecipeContent";
+			this.RecipeContent.Size = new System.Drawing.Size(392, 14);
+			this.RecipeContent.TabIndex = 12;
+			this.RecipeContent.Text = "星际物流运输船 1 = 钛合金 10 + 处理器 10 + 加力推进器 2";
+			this.RecipeContent.Click += new System.EventHandler(this.RecipeContent_Click);
+			// 
 			// Main
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(760, 531);
+			this.Controls.Add(this.RecipeContent);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.recipeIndexChoose);
 			this.Controls.Add(this.deviceToggle);
@@ -208,6 +221,7 @@
         private System.Windows.Forms.RadioButton deviceToggle;
 		private System.Windows.Forms.ComboBox recipeIndexChoose;
 		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.Label RecipeContent;
 	}
 }
 

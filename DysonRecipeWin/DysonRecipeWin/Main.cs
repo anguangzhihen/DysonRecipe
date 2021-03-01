@@ -20,6 +20,8 @@ namespace DysonRecipeWin
 				this.RecipeList.Items.Add(recipe.target.name);
 			}
 			ResultTreeView.Nodes.Clear();
+
+			RecipeContent.Text = "";
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
@@ -100,6 +102,8 @@ namespace DysonRecipeWin
 					recipeIndexChoose.Items.Add(recipe.displayName);
 				}
 				recipeIndexChoose.SelectedIndex = chosenRecipeTreeNode.recipeIndex;
+
+				RecipeContent.Text = chosenRecipeTreeNode.recipe.ToString();
 			}
 		}
 
@@ -122,9 +126,14 @@ namespace DysonRecipeWin
 			}
 
 			chosenRecipeTreeNode.SetAndSaveRecipeIndex(recipeIndexChoose.SelectedIndex);
-
+			RecipeContent.Text = chosenRecipeTreeNode.recipe.ToString();
 		}
 
 		private RecipeTreeNode chosenRecipeTreeNode = null;
+
+		private void RecipeContent_Click(object sender, EventArgs e)
+		{
+
+		}
 	}
 }

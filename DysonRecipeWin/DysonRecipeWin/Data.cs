@@ -177,6 +177,29 @@ namespace DysonRecipeWin
             return sb.ToString();
         }
 
+	    public override string ToString()
+	    {
+			StringBuilder sb = new StringBuilder();
+		    //sb.Append(GetDisplayName());
+		    //sb.Append("：");
+		    sb.Append(target);
+		    sb.Append(" <= ");
+		    bool first = true;
+		    foreach (var need in needs)
+		    {
+			    if (first)
+			    {
+				    first = false;
+			    }
+			    else
+			    {
+				    sb.Append(" + ");
+			    }
+			    sb.Append(need);
+		    }
+		    return sb.ToString();
+	    }
+
 	    public Number GetNeedCount(string itemName)
 	    {
 		    foreach (var need in needs)
@@ -201,7 +224,8 @@ namespace DysonRecipeWin
 
         public ItemPack target;
         public List<ItemPack> needs = new List<ItemPack>();
-        public Number time;
+	    public List<ItemPack> byproducts = new List<ItemPack>();
+		public Number time;
         public string building;
         public int level;
 	    public bool isGather = false;	// 采集

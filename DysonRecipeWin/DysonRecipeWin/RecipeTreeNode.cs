@@ -6,17 +6,18 @@ namespace DysonRecipeWin
 {
 	public class RecipeTreeNode : TreeNode
 	{
-		public static List<RecipeTreeNode> Calc(string itemName, Number count)
+		public static List<TreeNode> Calc(string itemName, Number count)
 		{
 			ClearByproduct();
 			recipeRoot = new RecipeTreeNode(itemName);
 			recipeRoot.SetItemNeedCount(count);
-			CalcLeftNode(recipeRoot);
-			ClearAndAddRecipeNodesToRoot(recipeRoot, byproductRoot);
+			CalcRecipeNode(recipeRoot);
+			CalcByproductTreeNodes();
+			ResetNodesToRoot();
 			return root;
 		}
 
-		public static bool CalcLeftNode(RecipeTreeNode treeNode)
+		public static bool CalcRecipeNode(RecipeTreeNode treeNode)
 		{
 			List<RecipeTreeNodePack> packs = new List<RecipeTreeNodePack>();
 			foreach (var need in treeNode.recipe.needs)
@@ -82,8 +83,12 @@ namespace DysonRecipeWin
 			root.Add(new RecipeTreeNode(){ Text = text });
 		}
 
-		public static void ClearAndAddRecipeNodesToRoot(params RecipeTreeNode[] nodes)
+		public static void ResetNodesToRoot()
 		{
+			List<TreeNode> nodes = new List<TreeNode>();
+			nodes.Add(recipeRoot);
+			nodes.Add(byproductRoot);
+
 			root.Clear();
 			foreach (var node in nodes)
 			{
@@ -94,9 +99,54 @@ namespace DysonRecipeWin
 			}
 		}
 
-		public static List<RecipeTreeNode> root = new List<RecipeTreeNode>();
+		public static void CalcByproductTreeNodes()
+		{
+			Dictionary<string, Number> dict = new Dictionary<string, Number>();
+			List<RecipeTreeNode> tmps = new List<RecipeTreeNode>();
+			tmps.Add(recipeRoot);
+			while (tmps.Count != 0)
+			{
+				var first = tmps[0];
+
+				foreach (var pair in first.byproductDict)
+				{
+					Number num;
+					if (!dict.TryGetValue(pair.Key, out num))
+					{
+						num = 0;
+						dict[pair.Key] = num;
+					}
+					dict[pair.Key] = num + pair.Value;
+				}
+
+				tmps.RemoveAt(0);
+			}
+
+			if (dict.Count == 0)
+			{
+				recipeRoot = null;
+			}
+			else
+			{
+				if (byproductRoot == null)
+				{
+					byproductRoot = new TreeNode("副产品");
+				}
+				else
+				{
+					byproductRoot.Nodes.Clear();
+				}
+				foreach (var pair in dict)
+				{
+					byproductRoot.Nodes.Add(new TreeNode(new ItemPack(pair.Key, pair.Value).ToString()));
+				}
+			}
+		}
+
+		public static List<TreeNode> root = new List<TreeNode>();
 		public static RecipeTreeNode recipeRoot = null;
-		public static RecipeTreeNode byproductRoot = null;
+		public static TreeNode byproductRoot = null;
+
 
 		public RecipeTreeNode()
 		{
@@ -115,11 +165,16 @@ namespace DysonRecipeWin
 				var parent = (RecipeTreeNode)Parent;
 
 				// 计算需求数
-				var parentRecipe = parent.recipe;
-				var parentTime = parentRecipe.time / Data.buildingEffective[parentRecipe.building];
-				var needCount = parent.buildingCount * parentRecipe.GetNeedCount(itemName) / parentTime;
-
+				var needCount = parent.buildingCount * parent.recipe.GetNeedCount(itemName) / parent.timeEffect;
 				SetItemNeedCount(needCount);
+
+				// 副产品
+				ClearByproducts();
+				foreach (var byproduct in recipe.byproducts)
+				{
+					var count = buildingCount * byproduct.count / timeEffect;
+					AddByproduct(byproduct.name, count);
+				}
 
 				// 额外信息
 				ClearExtraInfo();
@@ -196,9 +251,29 @@ namespace DysonRecipeWin
 			Calc();
 		}
 
-		public string itemName;
+		// 添加副产品，结果为正说明多余，结果为副说明缺少
+		public void AddByproduct(string itemName, Number count)
+		{
+			Number num;
+			if (byproductDict.TryGetValue(itemName, out num))
+			{
+				byproductDict[itemName] = num + count;
+			}
+			else
+			{
+				byproductDict[itemName] = count;
+			}
+		}
 
+		public void ClearByproducts()
+		{
+			byproductDict.Clear();
+		}
+
+		public string itemName;
 		public Number buildingCount;
+		public Dictionary<string, Number> byproductDict = new Dictionary<string, Number>();
+		public StringBuilder extraInfo = new StringBuilder();
 
 		public string building
 		{
@@ -208,6 +283,11 @@ namespace DysonRecipeWin
 		public Recipe recipe
 		{
 			get { return Data.GetRecipes(itemName)[recipeIndex]; }
+		}
+
+		public Number timeEffect
+		{
+			get { return recipe.time / Data.buildingEffective[recipe.building]; }
 		}
 
 		public int recipeIndex = 0;
@@ -235,8 +315,6 @@ namespace DysonRecipeWin
 				return ((RecipeTreeNode) Parent).depth + 1;
 			}
 		}
-
-		public StringBuilder extraInfo = new StringBuilder();
 	}
 
 	public class RecipeTreeNodePack
