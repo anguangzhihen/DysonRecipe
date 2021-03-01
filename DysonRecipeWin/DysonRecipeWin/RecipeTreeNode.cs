@@ -191,7 +191,8 @@ namespace DysonRecipeWin
 
 		public void SetAndSaveRecipeIndex(int recipeIndex)
 		{
-			Data.save.SetNodeIndex(itemName, depth, index, recipeIndex);
+			this.recipeIndex = recipeIndex;
+			//Data.save.SetNodeIndex(itemName, depth, index, recipeIndex);
 			Calc();
 		}
 
@@ -206,8 +207,10 @@ namespace DysonRecipeWin
 
 		public Recipe recipe
 		{
-			get { return Data.GetRecipe(itemName, depth, index); }
+			get { return Data.GetRecipes(itemName)[recipeIndex]; }
 		}
+
+		public int recipeIndex = 0;
 
 		public int index
 		{

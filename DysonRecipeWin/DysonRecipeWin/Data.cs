@@ -296,6 +296,7 @@ namespace DysonRecipeWin
 				nodeSave = new NodeSave();
 				nodeSave.index = index;
 				nodeSave.depth = depth;
+				recipeSave.nodeSaves.Add(nodeSave);
 			}
 			nodeSave.recipeIndex = recipeIndex;
 		}

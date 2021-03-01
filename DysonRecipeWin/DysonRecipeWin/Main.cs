@@ -99,6 +99,7 @@ namespace DysonRecipeWin
 				{
 					recipeIndexChoose.Items.Add(recipe.displayName);
 				}
+				recipeIndexChoose.SelectedIndex = chosenRecipeTreeNode.recipeIndex;
 			}
 		}
 
