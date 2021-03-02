@@ -63,9 +63,9 @@
 			this.label1.Font = new System.Drawing.Font("宋体", 12F);
 			this.label1.Location = new System.Drawing.Point(18, 16);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(72, 16);
+			this.label1.Size = new System.Drawing.Size(88, 16);
 			this.label1.TabIndex = 1;
-			this.label1.Text = "生产需求";
+			this.label1.Text = "生产需求：";
 			// 
 			// button1
 			// 
@@ -167,15 +167,15 @@
 			this.label2.Font = new System.Drawing.Font("宋体", 12F);
 			this.label2.Location = new System.Drawing.Point(172, 448);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(72, 16);
+			this.label2.Size = new System.Drawing.Size(88, 16);
 			this.label2.TabIndex = 11;
-			this.label2.Text = "选择配方";
+			this.label2.Text = "选择配方：";
 			// 
 			// RecipeContent
 			// 
 			this.RecipeContent.AutoSize = true;
 			this.RecipeContent.Font = new System.Drawing.Font("宋体", 10F);
-			this.RecipeContent.Location = new System.Drawing.Point(172, 480);
+			this.RecipeContent.Location = new System.Drawing.Point(261, 480);
 			this.RecipeContent.Name = "RecipeContent";
 			this.RecipeContent.Size = new System.Drawing.Size(392, 14);
 			this.RecipeContent.TabIndex = 12;

@@ -66,7 +66,7 @@ namespace DysonRecipeWin
 			}
 		}
 
-		void FoldGatherNode(RecipeTreeNode node)
+		void FoldGatherNode(TreeNode node)
 		{
 			bool hasGather = false;
 			foreach (var child in node.Nodes)

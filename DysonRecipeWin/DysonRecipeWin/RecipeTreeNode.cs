@@ -124,7 +124,7 @@ namespace DysonRecipeWin
 
 			if (dict.Count == 0)
 			{
-				recipeRoot = null;
+				byproductRoot = null;
 			}
 			else
 			{
