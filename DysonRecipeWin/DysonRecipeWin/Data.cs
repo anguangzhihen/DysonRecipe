@@ -53,17 +53,17 @@ namespace DysonRecipeWin
                             continue;
                         }
                         nullValueCount = 0;
-	                    var targetRow = sheet.Cells[i, j++].Value.ToString().Split('|');
-	                    string displayName = sheet.Cells[i, j++].Value.ToString();
+	                    var targetRow = sheet.Cells[i, j++].Value.GetStringOrEmpty().Split('|');
+	                    string displayName = sheet.Cells[i, j++].Value.GetStringOrEmpty();
                         List<string[]> needs= new List<string[]>();
-                        var needsRow = sheet.Cells[i, j++].Value.ToString().Split('|');
+                        var needsRow = sheet.Cells[i, j++].Value.GetStringOrEmpty().Split('|');
                         foreach (var row in needsRow)
                         {
                             needs.Add(row.Split(':'));
                         }
-	                    string building = sheet.Cells[i, j++].Value.ToString();
-	                    string time = sheet.Cells[i, j++].Value.ToString();
-	                    string level = sheet.Cells[i, j++].Value.ToString();
+	                    string building = sheet.Cells[i, j++].Value.GetStringOrEmpty();
+	                    string time = sheet.Cells[i, j++].Value.GetStringOrEmpty();
+	                    string level = sheet.Cells[i, j++].Value.GetStringOrEmpty();
 
 	                    foreach (var row in targetRow)
 	                    {
@@ -71,7 +71,7 @@ namespace DysonRecipeWin
 							var target = new ItemPack(targetStrs[0], new Number(targetStrs[1]));
 		                    Recipe recipe = new Recipe();
 		                    recipe.target = target;
-							recipe.displayName = displayName;
+							recipe.displayName = string.IsNullOrEmpty(displayName) ? target.name : displayName;
 		                    foreach (var row2 in targetRow)
 		                    {
 								var targetStrs2 = row2.Split(':');
@@ -121,12 +121,11 @@ namespace DysonRecipeWin
 	        }
         }
 
-	    public static Recipe GetRecipe(string itemName, int depth, int index)
+
+	    public static Recipe GetRecipe(string itemName)
 	    {
-		    var recipeIndex = save.GetNodeIndex(itemName, depth, index);
 		    var recipes = nameToRecipes[itemName];
-		    recipeIndex = Math.Min(Math.Max(recipeIndex, 0), recipes.Count);
-			return recipes[recipeIndex];
+			return recipes[0];
 	    }
 
 	    public static List<Recipe> GetRecipes(string itemName)
@@ -149,6 +148,18 @@ namespace DysonRecipeWin
 		public static string RECIPES_FILE_PATH = Directory.GetCurrentDirectory() + "/data/Recipes.xlsx";
 
     }
+
+	public static class Ext
+	{
+		public static string GetStringOrEmpty(this object obj)
+		{
+			if (obj == null)
+			{
+				return "";
+			}
+			return obj.ToString();
+		}
+	}
 
     public class Recipe
     {
@@ -222,6 +233,16 @@ namespace DysonRecipeWin
 		    return displayName;
 	    }
 
+	    public bool IsBuilding()
+	    {
+		    return level >= 10;
+	    }
+
+	    public bool IsComponent()
+	    {
+		    return !IsBuilding();
+	    }
+
         public ItemPack target;
         public List<ItemPack> needs = new List<ItemPack>();
 	    public List<ItemPack> byproducts = new List<ItemPack>();
@@ -266,78 +287,13 @@ namespace DysonRecipeWin
 
 	public class Save
 	{
-		public int GetNodeIndex(string itemName, int depth, int index)
+		public int GetDefaultIndex(string itemName)
 		{
-			foreach (var recipeSave in recipeSaves)
-			{
-				if (recipeSave.itemName != itemName)
-				{
-					continue;
-				}
-
-				foreach (var nodeSave in recipeSave.nodeSaves)
-				{
-					if (nodeSave.depth == depth && nodeSave.index == index)
-					{
-						return nodeSave.index;
-					}
-				}
-			}
-			return 0;
+			int result = 0;
+			nameToDefaultIndex.TryGetValue(itemName, out result);
+			return result;
 		}
 
-		public void SetNodeIndex(string itemName, int depth, int index, int recipeIndex)
-		{
-			RecipeSave recipeSave = null;
-			NodeSave nodeSave = null;
-			foreach (var rs in recipeSaves)
-			{
-				if (rs.itemName == itemName)
-				{
-					recipeSave = rs;
-					break;
-				}
-			}
-
-			if (recipeSave == null)
-			{
-				recipeSave = new RecipeSave();
-				recipeSave.itemName = itemName;
-				recipeSaves.Add(recipeSave);
-			}
-
-			foreach (var ns in recipeSave.nodeSaves)
-			{
-				if (ns.depth == depth && ns.index == index)
-				{
-					nodeSave = ns;
-					break;
-				}
-			}
-
-			if (nodeSave == null)
-			{
-				nodeSave = new NodeSave();
-				nodeSave.index = index;
-				nodeSave.depth = depth;
-				recipeSave.nodeSaves.Add(nodeSave);
-			}
-			nodeSave.recipeIndex = recipeIndex;
-		}
-
-		public List<RecipeSave> recipeSaves = new List<RecipeSave>();
-	}
-
-	public class RecipeSave
-	{
-		public string itemName;
-		public List<NodeSave> nodeSaves = new List<NodeSave>();
-	}
-
-	public class NodeSave
-	{
-		public int depth;
-		public int index;
-		public int recipeIndex;
+		public Dictionary<string, int> nameToDefaultIndex = new Dictionary<string, int>();
 	}
 }

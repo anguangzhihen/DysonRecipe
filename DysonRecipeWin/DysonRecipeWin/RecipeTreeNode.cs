@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 
@@ -60,6 +61,36 @@ namespace DysonRecipeWin
 			treeNode.Calc();
 
 			return true;
+		}
+
+		public static void CreateChildNodes(RecipeTreeNode node)
+		{
+			node.Nodes.Clear();
+			if (node.recipe == null)
+			{
+				return;
+			}
+
+			foreach (var need in node.recipe.needs)
+			{
+				var child = CreateNode(need.name);
+				CreateChildNodes(child);
+				node.Nodes.Add(child);
+			}
+		}
+
+		public static RecipeTreeNode CreateNode(string itemName)
+		{
+			if (!Data.nameToRecipes.ContainsKey(itemName))
+			{
+				return null;
+			}
+
+			return new RecipeTreeNode()
+			{
+				itemName = itemName,
+				recipeIndex = Data.save.GetDefaultIndex(itemName),
+			};
 		}
 
 		public static string Tab(int count)
@@ -274,6 +305,7 @@ namespace DysonRecipeWin
 		public Number buildingCount;
 		public Dictionary<string, Number> byproductDict = new Dictionary<string, Number>();
 		public StringBuilder extraInfo = new StringBuilder();
+		public int recipeIndex = 0;
 
 		public string building
 		{
@@ -282,15 +314,21 @@ namespace DysonRecipeWin
 
 		public Recipe recipe
 		{
-			get { return Data.GetRecipes(itemName)[recipeIndex]; }
+			get
+			{
+				var rs = Data.GetRecipes(itemName);
+				if (rs == null)
+				{
+					return null;
+				}
+				return rs[Math.Min(Math.Max(0, recipeIndex), rs.Count - 1)];
+			}
 		}
 
 		public Number timeEffect
 		{
 			get { return recipe.time / Data.buildingEffective[recipe.building]; }
 		}
-
-		public int recipeIndex = 0;
 
 		public int index
 		{

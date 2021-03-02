@@ -8,20 +8,28 @@ namespace DysonRecipeWin
 		public Main()
 		{
 			InitializeComponent();
+			ResetRecipeList(r => r.IsComponent());
+			ResultTreeView.Nodes.Clear();
+			RecipeContent.Text = "";
+		}
 
+		public void ResetRecipeList(Func<Recipe, bool> filter)
+		{
 			this.RecipeList.Items.Clear();
-
-			foreach (var recipe in Data.recipes)
+			for (int i = Data.recipes.Count - 1; i >= 0; i--)
 			{
+				var recipe = Data.recipes[i];
+				if (filter != null && !filter(recipe))
+				{
+					continue;
+				}
+
 				if (RecipeList.SelectedItem == null || string.IsNullOrEmpty(RecipeList.SelectedItem.ToString()))
 				{
 					RecipeList.SelectedItem = recipe.target.name;
 				}
 				this.RecipeList.Items.Add(recipe.target.name);
 			}
-			ResultTreeView.Nodes.Clear();
-
-			RecipeContent.Text = "";
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
@@ -134,6 +142,22 @@ namespace DysonRecipeWin
 		private void RecipeContent_Click(object sender, EventArgs e)
 		{
 
+		}
+
+		private void buildingToggle_CheckedChanged(object sender, EventArgs e)
+		{
+			if (buildingToggle.Checked)
+			{
+				ResetRecipeList(r => r.IsBuilding());
+			}
+		}
+
+		private void componentToggle_CheckedChanged(object sender, EventArgs e)
+		{
+			if (componentToggle.Checked)
+			{
+				ResetRecipeList(r => r.IsComponent());
+			}
 		}
 	}
 }
