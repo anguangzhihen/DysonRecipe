@@ -16,9 +16,15 @@ namespace DysonRecipeWin
 		public void ResetRecipeList(Func<Recipe, bool> filter)
 		{
 			this.RecipeList.Items.Clear();
-			for (int i = Data.recipes.Count - 1; i >= 0; i--)
+			for (int i = Data.itemNames.Count - 1; i >= 0; i--)
 			{
-				var recipe = Data.recipes[i];
+				var itemName = Data.itemNames[i];
+				var recipe = Data.GetRecipe(itemName);
+				if (recipe == null)
+				{
+					Console.WriteLine(@"recipe == null");
+					continue;
+				}
 				if (filter != null && !filter(recipe))
 				{
 					continue;
@@ -107,11 +113,12 @@ namespace DysonRecipeWin
 				var recipes = Data.GetRecipes(chosenRecipeTreeNode.itemName);
 				foreach (var recipe in recipes)
 				{
-					recipeIndexChoose.Items.Add(recipe.displayName);
+					recipeIndexChoose.Items.Add(recipe.GetDisplayName());
 				}
 				recipeIndexChoose.SelectedIndex = chosenRecipeTreeNode.recipeIndex;
 
 				RecipeContent.Text = chosenRecipeTreeNode.recipe.ToString();
+				defaultRecipeToggle.Checked = Data.save.GetDefaultIndex(chosenRecipeTreeNode.itemName) == chosenRecipeTreeNode.recipeIndex;
 			}
 		}
 
@@ -121,20 +128,21 @@ namespace DysonRecipeWin
 
 		private void recipeIndexChoose_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			Console.WriteLine("sender: " + sender + " e: " + e);
+			Console.WriteLine($@"sender: {sender} e: {e}");
 			if (recipeIndexChoose.SelectedIndex < 0)
 			{
-				Console.WriteLine("recipeIndexChoose.SelectedIndex < 0");
+				Console.WriteLine(@"recipeIndexChoose.SelectedIndex < 0");
 				return;
 			}
 			if (chosenRecipeTreeNode == null)
 			{
-				Console.WriteLine("chosenRecipeTreeNode == null");
+				Console.WriteLine(@"chosenRecipeTreeNode == null");
 				return;
 			}
 
 			chosenRecipeTreeNode.SetAndSaveRecipeIndex(recipeIndexChoose.SelectedIndex);
 			RecipeContent.Text = chosenRecipeTreeNode.recipe.ToString();
+			defaultRecipeToggle.Checked = Data.save.GetDefaultIndex(chosenRecipeTreeNode.itemName) == chosenRecipeTreeNode.recipeIndex;
 		}
 
 		private RecipeTreeNode chosenRecipeTreeNode = null;
@@ -158,6 +166,24 @@ namespace DysonRecipeWin
 			{
 				ResetRecipeList(r => r.IsComponent());
 			}
+		}
+
+		private void defaultRecipeToggle_CheckedChanged(object sender, EventArgs e)
+		{
+			Console.WriteLine("defaultRecipeToggle.Checked = " + defaultRecipeToggle.Checked);
+			if (defaultRecipeToggle.Checked)
+			{
+				if (!chosenRecipeTreeNode.recipe.couldDefault)
+				{
+					MessageBox.Show("无法选择该默认配方，因为产生了配方循环");
+				}
+				else
+				{
+					Data.save.SetDefaultIndex(chosenRecipeTreeNode.itemName, chosenRecipeTreeNode.recipeIndex);
+				}
+			}
+
+			defaultRecipeToggle.Checked = Data.save.GetDefaultIndex(chosenRecipeTreeNode.itemName) == chosenRecipeTreeNode.recipeIndex;
 		}
 	}
 }

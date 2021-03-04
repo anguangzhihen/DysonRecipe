@@ -28,7 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("节点0");
+			System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("节点0");
 			this.RecipeList = new System.Windows.Forms.ListBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.button1 = new System.Windows.Forms.Button();
@@ -45,6 +45,7 @@
 			this.buildingToggle = new System.Windows.Forms.RadioButton();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.defaultRecipeToggle = new System.Windows.Forms.RadioButton();
 			((System.ComponentModel.ISupportInitialize)(this.NumChoose)).BeginInit();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -106,10 +107,10 @@
 			this.ResultTreeView.Font = new System.Drawing.Font("宋体", 10F);
 			this.ResultTreeView.Location = new System.Drawing.Point(200, 44);
 			this.ResultTreeView.Name = "ResultTreeView";
-			treeNode2.Name = "节点0";
-			treeNode2.Text = "节点0";
+			treeNode3.Name = "节点0";
+			treeNode3.Text = "节点0";
 			this.ResultTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode2});
+            treeNode3});
 			this.ResultTreeView.Size = new System.Drawing.Size(561, 394);
 			this.ResultTreeView.TabIndex = 5;
 			this.ResultTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
@@ -240,11 +241,24 @@
 			this.groupBox2.TabIndex = 16;
 			this.groupBox2.TabStop = false;
 			// 
+			// defaultRecipeToggle
+			// 
+			this.defaultRecipeToggle.AutoSize = true;
+			this.defaultRecipeToggle.Location = new System.Drawing.Point(433, 453);
+			this.defaultRecipeToggle.Name = "defaultRecipeToggle";
+			this.defaultRecipeToggle.Size = new System.Drawing.Size(47, 16);
+			this.defaultRecipeToggle.TabIndex = 17;
+			this.defaultRecipeToggle.TabStop = true;
+			this.defaultRecipeToggle.Text = "默认";
+			this.defaultRecipeToggle.UseVisualStyleBackColor = true;
+			this.defaultRecipeToggle.CheckedChanged += new System.EventHandler(this.defaultRecipeToggle_CheckedChanged);
+			// 
 			// Main
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(777, 531);
+			this.Controls.Add(this.defaultRecipeToggle);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.RecipeContent);
@@ -286,6 +300,7 @@
 		private System.Windows.Forms.RadioButton buildingToggle;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.GroupBox groupBox2;
+		private System.Windows.Forms.RadioButton defaultRecipeToggle;
 	}
 }
 

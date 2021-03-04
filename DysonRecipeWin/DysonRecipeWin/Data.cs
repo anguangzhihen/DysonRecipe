@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Windows.Forms;
+using Newtonsoft.Json;
 using OfficeOpenXml;
 
 namespace DysonRecipeWin
@@ -20,7 +22,7 @@ namespace DysonRecipeWin
 	        oreNames.Add("水");
 	        oreNames.Add("原油");
 
-			recipes.Clear();
+			List<Recipe>  recipes = new List<Recipe>();
 	        foreach (var oreName in oreNames)
 	        {
 		        var recipe = new Recipe();
@@ -64,14 +66,26 @@ namespace DysonRecipeWin
 	                    string building = sheet.Cells[i, j++].Value.GetStringOrEmpty();
 	                    string time = sheet.Cells[i, j++].Value.GetStringOrEmpty();
 	                    string level = sheet.Cells[i, j++].Value.GetStringOrEmpty();
-
-	                    foreach (var row in targetRow)
+						bool isLoop = false;
+						bool.TryParse(sheet.Cells[i, j++].Value.GetStringOrEmpty(), out isLoop);
+						for (int k = 0; k < targetRow.Length; k++)
 	                    {
+		                    var row = targetRow[k];
 		                    var targetStrs = row.Split(':');
 							var target = new ItemPack(targetStrs[0], new Number(targetStrs[1]));
+
+		                    if (k == 0)
+		                    {
+			                    if (!itemNames.Contains(targetStrs[0]))
+			                    {
+				                    itemNames.Add(targetStrs[0]);
+								}
+							}
+
 		                    Recipe recipe = new Recipe();
 		                    recipe.target = target;
-							recipe.displayName = string.IsNullOrEmpty(displayName) ? target.name : displayName;
+							recipe.displayName = displayName;
+		                    recipe.isLoop = isLoop;
 		                    foreach (var row2 in targetRow)
 		                    {
 								var targetStrs2 = row2.Split(':');
@@ -92,6 +106,7 @@ namespace DysonRecipeWin
                     }
                     catch (Exception e)
                     {
+	                    MessageBox.Show($@"Excel格式错误 {i}行 {j - 1}列，请确认数据正确后再使用");
                         Console.WriteLine($@"Excel格式错误 {i}行 {j - 1}列 路径：{RECIPES_FILE_PATH}");
                         Console.WriteLine(e);
                         throw;
@@ -111,7 +126,7 @@ namespace DysonRecipeWin
 			};
 
 	        nameToRecipes = new Dictionary<string, List<Recipe>>();
-	        foreach (var recipe in Data.recipes)
+	        foreach (var recipe in recipes)
 	        {
 		        if (!nameToRecipes.ContainsKey(recipe.target.name))
 		        {
@@ -119,8 +134,32 @@ namespace DysonRecipeWin
 		        }
 				nameToRecipes[recipe.target.name].Add(recipe);
 	        }
-        }
 
+	        foreach (var nameToRecipe in nameToRecipes)
+	        {
+		        if (!nameToRecipe.Value[0].couldDefault)
+		        {
+			        int index = 0;
+			        foreach (var recipe in nameToRecipe.Value)
+			        {
+				        if (recipe.couldDefault)
+				        {
+					        break;
+				        }
+				        index++;
+			        }
+			        if (index == nameToRecipe.Value.Count)
+			        {
+				        MessageBox.Show("没有找到非循环的配方，请确认数据正确后再使用");
+				        throw new Exception("没有找到非循环的配方，请确认数据正确后再使用");
+			        }
+					else
+			        {
+				        save.SetDefaultIndex(nameToRecipe.Key, index);
+			        }
+				}
+			}
+        }
 
 	    public static Recipe GetRecipe(string itemName)
 	    {
@@ -138,14 +177,48 @@ namespace DysonRecipeWin
 		    return null;
 	    }
 
-		public static Save save = new Save();
+	    public static void SaveFile()
+	    {
+		    var str = JsonConvert.SerializeObject(_save);
+			File.WriteAllText(SAVE_FILE_PATH, str);
+	    }
 
-		public static List<Recipe> recipes = new List<Recipe>();
+	    public static Save save
+		{
+		    get
+		    {
+			    if (_save == null)
+			    {
+				    try
+				    {
+					    if (File.Exists(SAVE_FILE_PATH))
+					    {
+						    _save = JsonConvert.DeserializeObject<Save>(File.ReadAllText(SAVE_FILE_PATH));
+					    }
+					}
+				    catch (Exception e)
+				    {
+					    Console.WriteLine(e);
+				    }
+
+				    if (_save == null)
+				    {
+					    _save = new Save();
+				    }
+			    }
+			    return _save;
+		    }
+	    }
+
+	    private static Save _save;
+
+		public static List<string> itemNames = new List<string>();
 	    public static List<string> oreNames = new List<string>();
 	    public static Dictionary<string, Number> buildingEffective;
 	    public static Dictionary<string, List<Recipe>> nameToRecipes;
 
 		public static string RECIPES_FILE_PATH = Directory.GetCurrentDirectory() + "/data/Recipes.xlsx";
+		public static string SAVE_FILE_PATH = Directory.GetCurrentDirectory() + "/save.json";
 
     }
 
@@ -243,7 +316,26 @@ namespace DysonRecipeWin
 		    return !IsBuilding();
 	    }
 
-        public ItemPack target;
+	    public bool couldDefault
+	    {
+		    get
+		    {
+			    if (isLoop)
+			    {
+				    return false;
+			    }
+			    foreach (var need in needs)
+			    {
+				    if (need.name == target.name)
+				    {
+					    return false;
+				    }
+			    }
+			    return true;
+		    }
+	    }
+
+		public ItemPack target;
         public List<ItemPack> needs = new List<ItemPack>();
 	    public List<ItemPack> byproducts = new List<ItemPack>();
 		public Number time;
@@ -251,6 +343,7 @@ namespace DysonRecipeWin
         public int level;
 	    public bool isGather = false;	// 采集
 	    public string displayName;
+	    public bool isLoop = false;
     }
 
     public struct ItemPack
@@ -292,6 +385,22 @@ namespace DysonRecipeWin
 			int result = 0;
 			nameToDefaultIndex.TryGetValue(itemName, out result);
 			return result;
+		}
+
+		public void SetDefaultIndex(string itemName, int index)
+		{
+			if (index == 0)
+			{
+				if (nameToDefaultIndex.ContainsKey(itemName))
+				{
+					nameToDefaultIndex.Remove(itemName);
+				}
+			}
+			else
+			{
+				nameToDefaultIndex[itemName] = index;
+			}
+			Data.SaveFile();
 		}
 
 		public Dictionary<string, int> nameToDefaultIndex = new Dictionary<string, int>();
