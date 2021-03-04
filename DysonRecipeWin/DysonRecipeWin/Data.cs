@@ -114,18 +114,19 @@ namespace DysonRecipeWin
                 }
             }
 
-	        buildingEffective = new Dictionary<string, Number>()
-	        {
-		        { "电弧熔炉", 1 },
-		        { "制造台", new Number(1, 1)},
-		        { "化工厂", 1 },
-		        { "微型粒子对撞器", 1 },
-		        { "矩阵研究站", 1 },
-				{ "原油精炼机", 1 },
-				{ "采集", 1 },
-			};
+	        buildingEffective.Clear();
+			RegisterBuilding(new Building(){ name = "制造台", displayName = "制造台 Ⅰ", effective = new Number(3, 4)});
+			RegisterBuilding(new Building(){ name = "制造台", displayName = "制造台 Ⅱ", effective = 1});
+			RegisterBuilding(new Building(){ name = "制造台", displayName = "制造台 Ⅲ", effective = new Number(3, 2)});
+			RegisterBuilding(new Building(){ name = "电弧熔炉", effective = 1});
+			RegisterBuilding(new Building(){ name = "化工厂", effective = 1});
+			RegisterBuilding(new Building(){ name = "微型粒子对撞器", effective = 1});
+			RegisterBuilding(new Building(){ name = "矩阵研究站", effective = 1});
+			RegisterBuilding(new Building(){ name = "原油精炼机", effective = 1});
+			RegisterBuilding(new Building(){ name = "采集", effective = 1});
 
-	        nameToRecipes = new Dictionary<string, List<Recipe>>();
+
+			nameToRecipes = new Dictionary<string, List<Recipe>>();
 	        foreach (var recipe in recipes)
 	        {
 		        if (!nameToRecipes.ContainsKey(recipe.target.name))
@@ -177,6 +178,28 @@ namespace DysonRecipeWin
 		    return null;
 	    }
 
+	    public static void RegisterBuilding(Building building)
+	    {
+		    List<Building> list = null;
+		    if (!buildingEffective.TryGetValue(building.name, out list))
+		    {
+			    list = new List<Building>();
+			    buildingEffective[building.name] = list;
+		    }
+			list.Add(building);
+		}
+
+	    public static Number GetBuildingEffective(string buildingName, int index = 0)
+	    {
+		    return 1;
+		    List<Building> list = null;
+		    if (!buildingEffective.TryGetValue(buildingName, out list))
+		    {
+			    return 1;
+		    }
+		    return list[Math.Max(Math.Min(index, list.Count - 1), 0)].effective;
+	    }
+
 	    public static void SaveFile()
 	    {
 		    var str = JsonConvert.SerializeObject(_save);
@@ -204,6 +227,7 @@ namespace DysonRecipeWin
 				    if (_save == null)
 				    {
 					    _save = new Save();
+						_save.SetBuildingDefaultIndex("制造台", 1);
 				    }
 			    }
 			    return _save;
@@ -214,7 +238,7 @@ namespace DysonRecipeWin
 
 		public static List<string> itemNames = new List<string>();
 	    public static List<string> oreNames = new List<string>();
-	    public static Dictionary<string, Number> buildingEffective;
+	    public static Dictionary<string, List<Building>> buildingEffective = new Dictionary<string, List<Building>>();
 	    public static Dictionary<string, List<Recipe>> nameToRecipes;
 
 		public static string RECIPES_FILE_PATH = Directory.GetCurrentDirectory() + "/data/Recipes.xlsx";
@@ -346,6 +370,22 @@ namespace DysonRecipeWin
 	    public bool isLoop = false;
     }
 
+	public class Building
+	{
+		public string GetDisplayName()
+		{
+			if (string.IsNullOrEmpty(displayName))
+			{
+				return name;
+			}
+			return displayName;
+		}
+
+		public string name;
+		public string displayName;
+		public Number effective;
+	}
+
     public struct ItemPack
     {
         public ItemPack(string name, Number count)
@@ -380,6 +420,16 @@ namespace DysonRecipeWin
 
 	public class Save
 	{
+		public int GetBuildingDefaultIndex(string itemName)
+		{
+			return GetDefaultIndex(itemName + "_建筑");
+		}
+
+		public void SetBuildingDefaultIndex(string itemName, int index)
+		{
+			SetDefaultIndex(itemName + "_建筑", index);
+		}
+
 		public int GetDefaultIndex(string itemName)
 		{
 			int result = 0;

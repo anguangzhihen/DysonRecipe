@@ -7,11 +7,14 @@ namespace DysonRecipeWin
 {
 	public class RecipeTreeNode : TreeNode
 	{
-		public static List<TreeNode> Calc(string itemName, Number count)
+		public static List<TreeNode> Calc(string itemName, Number count, bool isBuildingCount)
 		{
 			ClearByproduct();
 			recipeRoot = new RecipeTreeNode(itemName);
-			recipeRoot.SetItemNeedCount(count);
+			if(isBuildingCount)
+				recipeRoot.SetBuildingCount(count);
+			else
+				recipeRoot.SetItemNeedCount(count);
 			CalcRecipeNode(recipeRoot);
 			CalcByproductTreeNodes();
 			ResetNodesToRoot();
@@ -241,13 +244,18 @@ namespace DysonRecipeWin
 
 		public void SetItemNeedCount(Number itemNeedCount)
 		{
-			var time = recipe.time / Data.buildingEffective[recipe.building];
+			var time = recipe.time / Data.GetBuildingEffective(recipe.building, buildingIndex);
 			buildingCount = itemNeedCount * time / recipe.target.count;
+		}
+
+		public void SetBuildingCount(Number buildingCount)
+		{
+			this.buildingCount = buildingCount;
 		}
 
 		public string GetResultString()
 		{
-			Number effctive = Data.buildingEffective[recipe.building];
+			Number effctive = Data.GetBuildingEffective(recipe.building, buildingIndex);
 			string value = buildingCount.ToFloatString() + " " + building + "(" + itemName + ") " + recipe.ToSpeedString(effctive) + " " + extraInfo;
 			return value;
 		}
@@ -306,6 +314,7 @@ namespace DysonRecipeWin
 		public Dictionary<string, Number> byproductDict = new Dictionary<string, Number>();
 		public StringBuilder extraInfo = new StringBuilder();
 		public int recipeIndex = 0;
+		public int buildingIndex = 0;
 
 		public string building
 		{
@@ -327,7 +336,7 @@ namespace DysonRecipeWin
 
 		public Number timeEffect
 		{
-			get { return recipe.time / Data.buildingEffective[recipe.building]; }
+			get { return recipe.time / Data.GetBuildingEffective(recipe.building, index); }
 		}
 
 		public int index

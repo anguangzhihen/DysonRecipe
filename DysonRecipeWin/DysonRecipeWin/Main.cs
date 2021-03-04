@@ -57,6 +57,7 @@ namespace DysonRecipeWin
 		{
 			if (RecipeList.SelectedItem == null || string.IsNullOrEmpty(RecipeList.SelectedItem.ToString()))
 			{
+				MessageBox.Show("请选择配方");
 				Console.WriteLine("请选择配方");
 				return;
 			}
@@ -66,11 +67,7 @@ namespace DysonRecipeWin
 
 		    Number num = (int) NumChoose.Value;
 		    var itemName = RecipeList.SelectedItem.ToString();
-            if (deviceToggle.Checked)
-            {
-                num *= Data.GetRecipe(itemName).target.count;
-            }
-			var arr = RecipeTreeNode.Calc(itemName, num).ToArray();
+			var arr = RecipeTreeNode.Calc(itemName, num, deviceToggle.Checked).ToArray();
 			ResultTreeView.Nodes.AddRange(arr);
 			ResultTreeView.ExpandAll();
 
@@ -170,6 +167,12 @@ namespace DysonRecipeWin
 
 		private void defaultRecipeToggle_CheckedChanged(object sender, EventArgs e)
 		{
+			if (chosenRecipeTreeNode == null || chosenRecipeTreeNode.recipe == null)
+			{
+				defaultRecipeToggle.Checked = false;
+				return;
+			}
+
 			Console.WriteLine("defaultRecipeToggle.Checked = " + defaultRecipeToggle.Checked);
 			if (defaultRecipeToggle.Checked)
 			{
