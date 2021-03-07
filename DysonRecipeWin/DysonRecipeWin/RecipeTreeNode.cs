@@ -10,7 +10,7 @@ namespace DysonRecipeWin
 		public static List<TreeNode> Calc(string itemName, Number count, bool isBuildingCount)
 		{
 			ClearByproduct();
-			recipeRoot = new RecipeTreeNode(itemName);
+			recipeRoot = CreateNode(itemName);
 			if(isBuildingCount)
 				recipeRoot.SetBuildingCount(count);
 			else
@@ -29,6 +29,7 @@ namespace DysonRecipeWin
 				packs.Add(new RecipeTreeNodePack(){ itemName = need.name, parent = treeNode});
 			}
 
+            treeNode.Nodes.Clear();
 			int tmpCount = 0;
 			while (packs.Count > 0)
 			{
@@ -45,10 +46,7 @@ namespace DysonRecipeWin
 				}
 				else
 				{
-					var node = new RecipeTreeNode()
-					{
-						itemName = buildingPack.itemName,
-					};
+				    var node = CreateNode(buildingPack.itemName);
 
 					// 节点生成
 					buildingPack.parent.Nodes.Add(node);
@@ -286,8 +284,8 @@ namespace DysonRecipeWin
 		public void SetAndSaveRecipeIndex(int recipeIndex)
 		{
 			this.recipeIndex = recipeIndex;
-			//Data.save.SetNodeIndex(itemName, depth, index, recipeIndex);
-			Calc();
+            //Data.save.SetNodeIndex(itemName, depth, index, recipeIndex);
+		    CalcRecipeNode(this);
 		}
 
 		// 添加副产品，结果为正说明多余，结果为副说明缺少

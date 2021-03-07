@@ -202,8 +202,7 @@ namespace DysonRecipeWin
 
 	    public static void SaveFile()
 	    {
-	        return;
-		    var str = JsonConvert.SerializeObject(_save);
+		    var str = JsonConvert.SerializeObject(_save, Formatting.Indented);
 			File.WriteAllText(SAVE_FILE_PATH, str);
 	    }
 
