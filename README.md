@@ -1,1 +1,3 @@
 戴森球计划游戏的量化工具
+
+通过DysonRecipe\DysonRecipeWin\DysonRecipeWin\bin\Debug\DysonRecipeWin.exe可以直接运行
