@@ -297,6 +297,12 @@ namespace DysonRecipeWin
 		    //sb.Append(GetDisplayName());
 		    //sb.Append("：");
 		    sb.Append(target);
+	        foreach (var byproduct in byproducts)
+	        {
+	            sb.Append(" + ");
+	            sb.Append(byproduct);
+	        }
+
 		    sb.Append(" <= ");
 		    bool first = true;
 		    foreach (var need in needs)
@@ -407,7 +413,7 @@ namespace DysonRecipeWin
 
         public override string ToString()
         {
-            return name + " " + count;
+            return count + " " + name;
         }
 
         public string ToSpeedString(Number time, bool needName = true)

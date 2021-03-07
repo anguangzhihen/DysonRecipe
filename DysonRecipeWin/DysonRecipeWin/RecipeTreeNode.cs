@@ -139,46 +139,47 @@ namespace DysonRecipeWin
 
 		public static void CalcByproductTreeNodes()
 		{
+		    if (byproductRoot == null)
+		    {
+		        byproductRoot = new TreeNode("副产品");
+            }
+
 			Dictionary<string, Number> dict = new Dictionary<string, Number>();
 			List<RecipeTreeNode> tmps = new List<RecipeTreeNode>();
 			tmps.Add(recipeRoot);
 			while (tmps.Count != 0)
 			{
 				var first = tmps[0];
+			    foreach (var node in first.Nodes)
+			    {
+                    if(node is RecipeTreeNode)
+			            tmps.Add((RecipeTreeNode)node);
+			    }
 
 				foreach (var pair in first.byproductDict)
 				{
-					Number num;
+				    Number num = 0;
 					if (!dict.TryGetValue(pair.Key, out num))
 					{
-						num = 0;
-						dict[pair.Key] = num;
+						dict[pair.Key] = pair.Value;
 					}
-					dict[pair.Key] = num + pair.Value;
-				}
+					else
+					{
+					    dict[pair.Key] = num + pair.Value;
+                    }
+                }
 
 				tmps.RemoveAt(0);
 			}
 
-			if (dict.Count == 0)
-			{
-				byproductRoot = null;
-			}
-			else
-			{
-				if (byproductRoot == null)
-				{
-					byproductRoot = new TreeNode("副产品");
-				}
-				else
-				{
-					byproductRoot.Nodes.Clear();
-				}
-				foreach (var pair in dict)
-				{
-					byproductRoot.Nodes.Add(new TreeNode(new ItemPack(pair.Key, pair.Value).ToString()));
-				}
-			}
+			byproductRoot.Nodes.Clear();
+		    foreach (var pair in dict)
+		    {
+		        var value = pair.Value;
+		        value.num *= 60;
+                var str = string.Format("{0}{1}/min", pair.Key, value.ToFloatString());
+		        byproductRoot.Nodes.Add(str);
+		    }
 		}
 
 		public static List<TreeNode> root = new List<TreeNode>();
