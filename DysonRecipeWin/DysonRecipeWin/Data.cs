@@ -21,8 +21,9 @@ namespace DysonRecipeWin
 	        oreNames.Add("煤矿");
 	        oreNames.Add("水");
 	        oreNames.Add("原油");
+	        oreNames.Add("硫酸");
 
-			List<Recipe>  recipes = new List<Recipe>();
+            List<Recipe>  recipes = new List<Recipe>();
 	        foreach (var oreName in oreNames)
 	        {
 		        var recipe = new Recipe();

@@ -295,7 +295,8 @@ namespace DysonRecipeWin
             buildingIndex = Data.save.GetBuildingDefaultIndex(building);
             //Data.save.SetNodeIndex(itemName, depth, index, recipeIndex);
             CalcRecipeNode(this);
-		}
+		    CalcByproductTreeNodes();
+        }
 
 	    public void SetAndSaveBuildingIndex(int buildingIndex)
 	    {

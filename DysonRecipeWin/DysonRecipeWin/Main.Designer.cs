@@ -28,7 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("节点0");
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("节点0");
             this.RecipeList = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
@@ -112,10 +112,10 @@
             this.ResultTreeView.Font = new System.Drawing.Font("宋体", 10F);
             this.ResultTreeView.Location = new System.Drawing.Point(200, 44);
             this.ResultTreeView.Name = "ResultTreeView";
-            treeNode4.Name = "节点0";
-            treeNode4.Text = "节点0";
+            treeNode5.Name = "节点0";
+            treeNode5.Text = "节点0";
             this.ResultTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode4});
+            treeNode5});
             this.ResultTreeView.Size = new System.Drawing.Size(561, 394);
             this.ResultTreeView.TabIndex = 5;
             this.ResultTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
@@ -319,7 +319,7 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
             this.Name = "Main";
-            this.Text = "暗光の戴森球量化工具";
+            this.Text = "暗光の戴森球量化工具 v0.1";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.NumChoose)).EndInit();
             this.groupBox1.ResumeLayout(false);
