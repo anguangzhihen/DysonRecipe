@@ -9,7 +9,10 @@ namespace DysonRecipeWin
 	{
 		public static List<TreeNode> Calc(string itemName, Number count, bool isBuildingCount)
 		{
-			ClearByproduct();
+		    rootIsBuildingCount = isBuildingCount;
+		    rootCount = count;
+
+            ClearByproduct();
 			recipeRoot = CreateNode(itemName);
 			if(isBuildingCount)
 				recipeRoot.SetBuildingCount(count);
@@ -87,11 +90,14 @@ namespace DysonRecipeWin
 				return null;
 			}
 
-			return new RecipeTreeNode()
+			var node = new RecipeTreeNode()
 			{
 				itemName = itemName,
 				recipeIndex = Data.save.GetDefaultIndex(itemName),
 			};
+		    node.buildingIndex = Data.save.GetBuildingDefaultIndex(node.recipe.building);
+
+            return node;
 		}
 
 		public static string Tab(int count)
@@ -178,9 +184,10 @@ namespace DysonRecipeWin
 		public static List<TreeNode> root = new List<TreeNode>();
 		public static RecipeTreeNode recipeRoot = null;
 		public static TreeNode byproductRoot = null;
+	    public static bool rootIsBuildingCount;
+	    public static Number rootCount;
 
-
-		public RecipeTreeNode()
+        public RecipeTreeNode()
 		{
 		}
 
@@ -284,12 +291,23 @@ namespace DysonRecipeWin
 		public void SetAndSaveRecipeIndex(int recipeIndex)
 		{
 			this.recipeIndex = recipeIndex;
+            buildingIndex = Data.save.GetBuildingDefaultIndex(building);
             //Data.save.SetNodeIndex(itemName, depth, index, recipeIndex);
-		    CalcRecipeNode(this);
+            CalcRecipeNode(this);
 		}
 
-		// 添加副产品，结果为正说明多余，结果为副说明缺少
-		public void AddByproduct(string itemName, Number count)
+	    public void SetAndSaveBuildingIndex(int buildingIndex)
+	    {
+	        this.buildingIndex = buildingIndex;
+	        if (rootIsBuildingCount)
+	            recipeRoot.SetBuildingCount(rootCount);
+	        else
+	            recipeRoot.SetItemNeedCount(rootCount);
+	        recipeRoot.Calc();
+        }
+
+        // 添加副产品，结果为正说明多余，结果为副说明缺少
+        public void AddByproduct(string itemName, Number count)
 		{
 			Number num;
 			if (byproductDict.TryGetValue(itemName, out num))
@@ -334,31 +352,7 @@ namespace DysonRecipeWin
 
 		public Number timeEffect
 		{
-			get { return recipe.time / Data.GetBuildingEffective(recipe.building, index); }
-		}
-
-		public int index
-		{
-			get
-			{
-				if (Parent == null || !(Parent is RecipeTreeNode))
-				{
-					return 0;
-				}
-				return Parent.Nodes.IndexOf(this);
-			}
-		}
-
-		public int depth
-		{
-			get
-			{
-				if (Parent == null || !(Parent is RecipeTreeNode))
-				{
-					return 0;
-				}
-				return ((RecipeTreeNode) Parent).depth + 1;
-			}
+			get { return recipe.time / Data.GetBuildingEffective(recipe.building, buildingIndex); }
 		}
 	}
 

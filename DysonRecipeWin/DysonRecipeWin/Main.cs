@@ -13,6 +13,7 @@ namespace DysonRecipeWin
 			RecipeContent.Text = "";
 		}
 
+        // 重置配方列表
 		public void ResetRecipeList(Func<Recipe, bool> filter)
 		{
 			this.RecipeList.Items.Clear();
@@ -38,17 +39,62 @@ namespace DysonRecipeWin
 			}
 		}
 
-		private void Form1_Load(object sender, EventArgs e)
+        // 重置具体的配方选项
+	    public void ResetRecipeIndexChoose()
+	    {
+	        noPostEvent = true;
+	        if (chosenRecipeTreeNode == null)
+	        {
+	            recipeIndexChoose.Items.Clear();
+	            recipeIndexChoose.Text = "";
+                RecipeContent.Text = "";
+	            defaultRecipeCheckBox.Checked = false;
+            }
+	        else
+	        {
+	            recipeIndexChoose.Items.Clear();
+	            var recipes = Data.GetRecipes(chosenRecipeTreeNode.itemName);
+	            foreach (var recipe in recipes)
+	            {
+	                recipeIndexChoose.Items.Add(recipe.GetDisplayName());
+	            }
+	            recipeIndexChoose.SelectedIndex = chosenRecipeTreeNode.recipeIndex;
+	            RecipeContent.Text = chosenRecipeTreeNode.recipe.ToString();
+	            defaultRecipeCheckBox.Checked = Data.save.GetDefaultIndex(chosenRecipeTreeNode.itemName) == chosenRecipeTreeNode.recipeIndex;
+            }
+	        noPostEvent = false;
+        }
+
+        // 重置具体的建筑选项
+        public void ResetBuildingIndexChoose()
+	    {
+	        noPostEvent = true;
+	        if (chosenRecipeTreeNode == null)
+	        {
+	            buildingIndexChoose.Items.Clear();
+	            buildingIndexChoose.Text = "";
+                defaultBuildingCheckBox.Checked = false;
+	        }
+	        else
+	        {
+	            buildingIndexChoose.Items.Clear();
+	            var buildings = Data.GetEffectiveBuildings(chosenRecipeTreeNode.building);
+	            foreach (var building in buildings)
+	            {
+	                buildingIndexChoose.Items.Add(building.GetDisplayName());
+	            }
+	            buildingIndexChoose.SelectedIndex = chosenRecipeTreeNode.buildingIndex;
+	            defaultBuildingCheckBox.Checked = Data.save.GetBuildingDefaultIndex(chosenRecipeTreeNode.building) == chosenRecipeTreeNode.buildingIndex;
+            }
+	        noPostEvent = false;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
 		{
 
 		}
 
 		private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
-		{
-
-		}
-
-		private void checkedListBox1_SelectedIndexChanged(object sender, EventArgs e)
 		{
 
 		}
@@ -75,6 +121,9 @@ namespace DysonRecipeWin
 			{
 				FoldGatherNode(recipeTreeNode);
 			}
+		    chosenRecipeTreeNode = null;
+		    ResetRecipeIndexChoose();
+		    ResetBuildingIndexChoose();
 		}
 
 		void FoldGatherNode(TreeNode node)
@@ -100,47 +149,19 @@ namespace DysonRecipeWin
 			}
 		}
 
-
 		private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
 		{
 			if (e.Node is RecipeTreeNode)
 			{
-				recipeIndexChoose.Items.Clear();
 				chosenRecipeTreeNode = (RecipeTreeNode) e.Node;
-				var recipes = Data.GetRecipes(chosenRecipeTreeNode.itemName);
-				foreach (var recipe in recipes)
-				{
-					recipeIndexChoose.Items.Add(recipe.GetDisplayName());
-				}
-				recipeIndexChoose.SelectedIndex = chosenRecipeTreeNode.recipeIndex;
-
-				RecipeContent.Text = chosenRecipeTreeNode.recipe.ToString();
-				defaultRecipeToggle.Checked = Data.save.GetDefaultIndex(chosenRecipeTreeNode.itemName) == chosenRecipeTreeNode.recipeIndex;
+			    ResetRecipeIndexChoose();
+                ResetBuildingIndexChoose();
 			}
 		}
 
         private void NumChoose_ValueChanged(object sender, EventArgs e)
         {
         }
-
-		private void recipeIndexChoose_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			Console.WriteLine($@"sender: {sender} e: {e}");
-			if (recipeIndexChoose.SelectedIndex < 0)
-			{
-				Console.WriteLine(@"recipeIndexChoose.SelectedIndex < 0");
-				return;
-			}
-			if (chosenRecipeTreeNode == null)
-			{
-				Console.WriteLine(@"chosenRecipeTreeNode == null");
-				return;
-			}
-
-			chosenRecipeTreeNode.SetAndSaveRecipeIndex(recipeIndexChoose.SelectedIndex);
-			RecipeContent.Text = chosenRecipeTreeNode.recipe.ToString();
-			defaultRecipeToggle.Checked = Data.save.GetDefaultIndex(chosenRecipeTreeNode.itemName) == chosenRecipeTreeNode.recipeIndex;
-		}
 
 		private RecipeTreeNode chosenRecipeTreeNode = null;
 
@@ -165,28 +186,91 @@ namespace DysonRecipeWin
 			}
 		}
 
-		private void defaultRecipeToggle_CheckedChanged(object sender, EventArgs e)
-		{
-			if (chosenRecipeTreeNode == null || chosenRecipeTreeNode.recipe == null)
-			{
-				defaultRecipeToggle.Checked = false;
-				return;
-			}
+        #region 配方详情
 
-			Console.WriteLine("defaultRecipeToggle.Checked = " + defaultRecipeToggle.Checked);
-			if (defaultRecipeToggle.Checked)
-			{
-				if (!chosenRecipeTreeNode.recipe.couldDefault)
-				{
-					MessageBox.Show("无法选择该默认配方，因为产生了配方循环");
-				}
-				else
-				{
-					Data.save.SetDefaultIndex(chosenRecipeTreeNode.itemName, chosenRecipeTreeNode.recipeIndex);
-				}
-			}
+        private void recipeIndexChoose_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (noPostEvent)
+                return;
 
-			defaultRecipeToggle.Checked = Data.save.GetDefaultIndex(chosenRecipeTreeNode.itemName) == chosenRecipeTreeNode.recipeIndex;
-		}
-	}
+            Console.WriteLine($@"sender: {sender} e: {e}");
+            if (recipeIndexChoose.SelectedIndex < 0)
+            {
+                Console.WriteLine(@"recipeIndexChoose.SelectedIndex < 0");
+                return;
+            }
+            if (chosenRecipeTreeNode == null)
+            {
+                Console.WriteLine(@"chosenRecipeTreeNode == null");
+                return;
+            }
+            chosenRecipeTreeNode.SetAndSaveRecipeIndex(recipeIndexChoose.SelectedIndex);
+            RecipeContent.Text = chosenRecipeTreeNode.recipe.ToString();
+            defaultRecipeCheckBox.Checked = Data.save.GetDefaultIndex(chosenRecipeTreeNode.itemName) == chosenRecipeTreeNode.recipeIndex;
+            ResetBuildingIndexChoose();
+        }
+
+        private void defaultRecipeCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chosenRecipeTreeNode == null || chosenRecipeTreeNode.recipe == null)
+            {
+                defaultRecipeCheckBox.Checked = false;
+                return;
+            }
+
+            Console.WriteLine("defaultRecipeCheckBox_CheckedChanged Checked = " + defaultRecipeCheckBox.Checked);
+            if (defaultRecipeCheckBox.Checked)
+            {
+                if (!chosenRecipeTreeNode.recipe.couldDefault)
+                {
+                    MessageBox.Show("无法选择该默认配方，因为产生了配方循环");
+                }
+                else
+                {
+                    Data.save.SetDefaultIndex(chosenRecipeTreeNode.itemName, chosenRecipeTreeNode.recipeIndex);
+                }
+            }
+
+            defaultRecipeCheckBox.Checked = Data.save.GetDefaultIndex(chosenRecipeTreeNode.itemName) == chosenRecipeTreeNode.recipeIndex;
+        }
+
+	    private void buildingIndexChoose_SelectedIndexChanged(object sender, EventArgs e)
+	    {
+            if (noPostEvent)
+                return;
+
+	        if (buildingIndexChoose.SelectedIndex < 0)
+	        {
+	            Console.WriteLine(@"recipeIndexChoose.SelectedIndex < 0");
+	            return;
+	        }
+	        if (chosenRecipeTreeNode == null)
+	        {
+	            Console.WriteLine(@"chosenRecipeTreeNode == null");
+	            return;
+	        }
+
+	        chosenRecipeTreeNode.SetAndSaveBuildingIndex(buildingIndexChoose.SelectedIndex);
+	        defaultBuildingCheckBox.Checked = Data.save.GetBuildingDefaultIndex(chosenRecipeTreeNode.building) == chosenRecipeTreeNode.buildingIndex;
+        }
+
+        private void defaultBuildingCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chosenRecipeTreeNode == null || chosenRecipeTreeNode.recipe == null || string.IsNullOrEmpty(chosenRecipeTreeNode.building))
+            {
+                defaultBuildingCheckBox.Checked = false;
+                return;
+            }
+            Console.WriteLine("defaultBuildingCheckBox_CheckedChanged Checked = " + defaultRecipeCheckBox.Checked);
+            if (defaultBuildingCheckBox.Checked)
+            {
+                Data.save.SetBuildingDefaultIndex(chosenRecipeTreeNode.building, chosenRecipeTreeNode.buildingIndex);
+            }
+        }
+
+	    private static bool noPostEvent = false;
+
+        #endregion
+
+    }
 }

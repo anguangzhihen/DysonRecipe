@@ -191,7 +191,6 @@ namespace DysonRecipeWin
 
 	    public static Number GetBuildingEffective(string buildingName, int index = 0)
 	    {
-		    return 1;
 		    List<Building> list = null;
 		    if (!buildingEffective.TryGetValue(buildingName, out list))
 		    {
@@ -199,6 +198,13 @@ namespace DysonRecipeWin
 		    }
 		    return list[Math.Max(Math.Min(index, list.Count - 1), 0)].effective;
 	    }
+
+        public static List<Building> GetEffectiveBuildings(string buildingName)
+        {
+		    List<Building> list = null;
+            buildingEffective.TryGetValue(buildingName, out list);
+            return list;
+        }
 
 	    public static void SaveFile()
 	    {

@@ -28,7 +28,7 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("节点0");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("节点0");
             this.RecipeList = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
@@ -45,8 +45,11 @@
             this.buildingToggle = new System.Windows.Forms.RadioButton();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.defaultRecipeToggle = new System.Windows.Forms.RadioButton();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.defaultRecipeCheckBox = new System.Windows.Forms.CheckBox();
+            this.buildingIndexChoose = new System.Windows.Forms.ComboBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.defaultBuildingCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.NumChoose)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -79,7 +82,7 @@
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("宋体", 12F);
-            this.button1.Location = new System.Drawing.Point(15, 444);
+            this.button1.Location = new System.Drawing.Point(21, 453);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 2;
@@ -109,10 +112,10 @@
             this.ResultTreeView.Font = new System.Drawing.Font("宋体", 10F);
             this.ResultTreeView.Location = new System.Drawing.Point(200, 44);
             this.ResultTreeView.Name = "ResultTreeView";
-            treeNode2.Name = "节点0";
-            treeNode2.Text = "节点0";
+            treeNode3.Name = "节点0";
+            treeNode3.Text = "节点0";
             this.ResultTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode2});
+            treeNode3});
             this.ResultTreeView.Size = new System.Drawing.Size(561, 394);
             this.ResultTreeView.TabIndex = 5;
             this.ResultTreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeView1_AfterSelect);
@@ -166,7 +169,7 @@
             // 
             this.recipeIndexChoose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.recipeIndexChoose.FormattingEnabled = true;
-            this.recipeIndexChoose.Location = new System.Drawing.Point(103, 10);
+            this.recipeIndexChoose.Location = new System.Drawing.Point(103, 16);
             this.recipeIndexChoose.Name = "recipeIndexChoose";
             this.recipeIndexChoose.Size = new System.Drawing.Size(121, 20);
             this.recipeIndexChoose.TabIndex = 10;
@@ -177,7 +180,7 @@
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("宋体", 12F);
-            this.label2.Location = new System.Drawing.Point(9, 10);
+            this.label2.Location = new System.Drawing.Point(6, 17);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(88, 16);
             this.label2.TabIndex = 11;
@@ -188,7 +191,7 @@
             this.RecipeContent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.RecipeContent.AutoSize = true;
             this.RecipeContent.Font = new System.Drawing.Font("宋体", 10F);
-            this.RecipeContent.Location = new System.Drawing.Point(100, 37);
+            this.RecipeContent.Location = new System.Drawing.Point(100, 74);
             this.RecipeContent.Name = "RecipeContent";
             this.RecipeContent.Size = new System.Drawing.Size(392, 14);
             this.RecipeContent.TabIndex = 12;
@@ -243,37 +246,70 @@
             this.groupBox2.TabIndex = 16;
             this.groupBox2.TabStop = false;
             // 
-            // defaultRecipeToggle
-            // 
-            this.defaultRecipeToggle.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.defaultRecipeToggle.AutoSize = true;
-            this.defaultRecipeToggle.Location = new System.Drawing.Point(230, 14);
-            this.defaultRecipeToggle.Name = "defaultRecipeToggle";
-            this.defaultRecipeToggle.Size = new System.Drawing.Size(47, 16);
-            this.defaultRecipeToggle.TabIndex = 17;
-            this.defaultRecipeToggle.TabStop = true;
-            this.defaultRecipeToggle.Text = "默认";
-            this.defaultRecipeToggle.UseVisualStyleBackColor = true;
-            this.defaultRecipeToggle.CheckedChanged += new System.EventHandler(this.defaultRecipeToggle_CheckedChanged);
-            // 
             // groupBox3
             // 
             this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox3.Controls.Add(this.defaultBuildingCheckBox);
+            this.groupBox3.Controls.Add(this.defaultRecipeCheckBox);
+            this.groupBox3.Controls.Add(this.buildingIndexChoose);
+            this.groupBox3.Controls.Add(this.label5);
             this.groupBox3.Controls.Add(this.label2);
-            this.groupBox3.Controls.Add(this.defaultRecipeToggle);
             this.groupBox3.Controls.Add(this.recipeIndexChoose);
             this.groupBox3.Controls.Add(this.RecipeContent);
-            this.groupBox3.Location = new System.Drawing.Point(200, 453);
+            this.groupBox3.Location = new System.Drawing.Point(200, 444);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(498, 66);
+            this.groupBox3.Size = new System.Drawing.Size(498, 100);
             this.groupBox3.TabIndex = 18;
             this.groupBox3.TabStop = false;
+            // 
+            // defaultRecipeCheckBox
+            // 
+            this.defaultRecipeCheckBox.AutoSize = true;
+            this.defaultRecipeCheckBox.Location = new System.Drawing.Point(230, 20);
+            this.defaultRecipeCheckBox.Name = "defaultRecipeCheckBox";
+            this.defaultRecipeCheckBox.Size = new System.Drawing.Size(48, 16);
+            this.defaultRecipeCheckBox.TabIndex = 21;
+            this.defaultRecipeCheckBox.Text = "默认";
+            this.defaultRecipeCheckBox.UseVisualStyleBackColor = true;
+            this.defaultRecipeCheckBox.CheckedChanged += new System.EventHandler(this.defaultRecipeCheckBox_CheckedChanged);
+            // 
+            // buildingIndexChoose
+            // 
+            this.buildingIndexChoose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buildingIndexChoose.FormattingEnabled = true;
+            this.buildingIndexChoose.Location = new System.Drawing.Point(103, 44);
+            this.buildingIndexChoose.Name = "buildingIndexChoose";
+            this.buildingIndexChoose.Size = new System.Drawing.Size(121, 20);
+            this.buildingIndexChoose.TabIndex = 19;
+            this.buildingIndexChoose.SelectedIndexChanged += new System.EventHandler(this.buildingIndexChoose_SelectedIndexChanged);
+            // 
+            // label5
+            // 
+            this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("宋体", 12F);
+            this.label5.Location = new System.Drawing.Point(6, 44);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(88, 16);
+            this.label5.TabIndex = 18;
+            this.label5.Text = "选择建筑：";
+            // 
+            // defaultBuildingCheckBox
+            // 
+            this.defaultBuildingCheckBox.AutoSize = true;
+            this.defaultBuildingCheckBox.Location = new System.Drawing.Point(230, 48);
+            this.defaultBuildingCheckBox.Name = "defaultBuildingCheckBox";
+            this.defaultBuildingCheckBox.Size = new System.Drawing.Size(48, 16);
+            this.defaultBuildingCheckBox.TabIndex = 22;
+            this.defaultBuildingCheckBox.Text = "默认";
+            this.defaultBuildingCheckBox.UseVisualStyleBackColor = true;
+            this.defaultBuildingCheckBox.CheckedChanged += new System.EventHandler(this.defaultBuildingCheckBox_CheckedChanged);
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(777, 531);
+            this.ClientSize = new System.Drawing.Size(777, 556);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
@@ -315,8 +351,11 @@
 		private System.Windows.Forms.RadioButton buildingToggle;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.GroupBox groupBox2;
-		private System.Windows.Forms.RadioButton defaultRecipeToggle;
         private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.ComboBox buildingIndexChoose;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.CheckBox defaultRecipeCheckBox;
+        private System.Windows.Forms.CheckBox defaultBuildingCheckBox;
     }
 }
 
